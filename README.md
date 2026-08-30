@@ -116,3 +116,19 @@ lib/            # 文章读取、SQLite 数据层、shiki 高亮插件
 deploy/         # Docker Compose / cloudflared / Caddy 部署文件
 docs/           # 项目设计文档
 ```
+## Git 工作流（本机为源）
+
+```text
+本机 E:\personal blog（真源）
+  │  git commit + push（SSH key）
+  ▼
+GitHub: InInNHD/fireflyiv-blog（Public，已做敏感信息脱敏）
+  │  服务器每小时 cron 自动 git pull --ff-only 对齐
+  ▼
+服务器 ~/fireflyiv-blog（部署副本；~/subsites → deploy/subsites 软链接）
+```
+
+- **日常更新**：本机改文件 → `git add -A && git commit && git push` → 部署到服务器（上传或等 pull）→ 按需 rebuild
+- **敏感信息红线**：`.env`、密码、授权码**绝不入库**（已 .gitignore；样例见各 `.env.example`）
+- **服务器对齐**：每小时自动 pull；手动触发：`cd ~/fireflyiv-blog && git pull origin main`
+- **一致性检查**：本机 `git status`、服务器 `git log --oneline -1`、GitHub 网页，三者应指向同一 commit
