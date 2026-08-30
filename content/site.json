@@ -1,0 +1,14 @@
+{
+  "name": "FireflyIv 的萤火小站",
+  "nick": "FireflyIv",
+  "slogan": "萤火虽微，愿为其芒",
+  "description": "一个自托管在腾讯云的个人博客。记录技术、生活与零碎想法，内容全部以 Markdown 保存在 Git 仓库中。",
+  "avatar": "🪰",
+  "social": {
+    "github": "https://github.com/fireflyiv",
+    "bilibili": "https://space.bilibili.com",
+    "email": "hi@fireflyiv.com",
+    "rss": "/feed.xml"
+  },
+  "icp": ""
+}

@@ -1,0 +1,10 @@
+/* 点击特效动画（click-effect.tsx 使用） */
+@keyframes click-ring {
+  0%   { opacity: 0.85; transform: translate(-50%, -50%) scale(0.2); }
+  100% { opacity: 0;    transform: translate(-50%, -50%) scale(1.9); }
+}
+
+@keyframes click-dot {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+}

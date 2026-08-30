@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Xinghuisama 的小站",
+    "url": "https://www.xinghuisama.top",
+    "avatar": "🦋",
+    "desc": "本项目灵感来源"
+  },
+  {
+    "name": "Astro Paper",
+    "url": "https://astro-paper.pages.dev",
+    "avatar": "📄",
+    "desc": "简洁的 Astro 博客模板"
+  },
+  {
+    "name": "Hugo PaperMod",
+    "url": "https://adityatelange.github.io/hugo-PaperMod/",
+    "avatar": "📰",
+    "desc": "Hugo 生态最流行的主题"
+  }
+]

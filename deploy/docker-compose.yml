@@ -1,0 +1,46 @@
+# FireflyIv Blog 部署编排
+# 用法：在 deploy/ 目录执行 docker compose up -d --build
+# 说明：web 构建上下文为代码根目录（..），artalk 直接拉官方镜像
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+      args:
+        NEXT_PUBLIC_ARTALK_SERVER: ${NEXT_PUBLIC_ARTALK_SERVER:-https://talk.fireflyiv.com}
+    container_name: fireflyiv-web
+    restart: unless-stopped
+    # 只绑 127.0.0.1：公网入口完全交给 cloudflared 隧道
+    # 注：8080 在本机/服务器均被其他服务占用，统一改用 8082（与其他项目互不干扰）
+    ports:
+      - "127.0.0.1:8082:3000"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - SITE_URL=https://www.fireflyiv.com
+      - CHATTER_TOKEN=${CHATTER_TOKEN:-change-me-to-a-long-random-string}
+      - NEXT_PUBLIC_ARTALK_SERVER=${NEXT_PUBLIC_ARTALK_SERVER:-https://talk.fireflyiv.com}
+      - UMAMI_PG_URL=${UMAMI_PG_URL:-}
+      - UMAMI_WEBSITE_ID=bbfbe70a-b862-4e6b-b1f1-b369a6cbacec
+      - SMTP_HOST=smtp.qq.com
+      - SMTP_USER=firefly1v@qq.com
+      - SMTP_PASS=${SMTP_PASS:-}
+      - FRIEND_NOTIFY_TO=${FRIEND_NOTIFY_TO:-firefly1v@qq.com}
+    volumes:
+      - fireflyiv-data:/app/data
+
+  artalk:
+    image: artalk/artalk-go:latest
+    container_name: fireflyiv-artalk
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1234:23366"
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - fireflyiv-artalk:/data
+    # 首次启动自动生成配置，按需修改后重启
+
+volumes:
+  fireflyiv-data:
+  fireflyiv-artalk:
