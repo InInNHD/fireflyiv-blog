@@ -1,0 +1,13 @@
+[Unit]
+Description=Beszel Hub (monitor.fireflyiv.com)
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/var/lib/beszel
+ExecStart=/usr/local/bin/beszel serve --http=127.0.0.1:8706
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

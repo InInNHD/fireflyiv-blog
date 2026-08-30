@@ -1,0 +1,28 @@
+# umami 访问统计（stats.fireflyiv.com → 127.0.0.1:8700）
+services:
+  umami:
+    image: ghcr.io/umami-software/umami:postgresql-latest
+    container_name: umami
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8700:3000"
+    environment:
+      DATABASE_URL: postgresql://umami:${UMAMI_PG_PASSWORD:-change-me}@postgres:5432/umami
+      DATABASE_TYPE: postgresql
+      APP_SECRET: 8f4a3686af7f1b7e58e663a1e0672c3c4f74872f8cd6681f15ce14577f177089
+    depends_on:
+      - postgres
+  postgres:
+    image: postgres:16-alpine
+    ports:
+      - "172.17.0.1:8731:5432"
+    container_name: umami-pg
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: umami
+      POSTGRES_USER: umami
+      POSTGRES_PASSWORD: ${UMAMI_PG_PASSWORD:-change-me}
+    volumes:
+      - umami-data:/var/lib/postgresql/data
+volumes:
+  umami-data:

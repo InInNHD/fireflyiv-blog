@@ -1,0 +1,13 @@
+# 导航站（nav.fireflyiv.com → 127.0.0.1:8710）
+services:
+  dashy:
+    image: lissy93/dashy:latest
+    container_name: dashy
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8710:8080"
+    volumes:
+      - ./conf.yml:/app/public/conf.yml
+      - dashy-icons:/app/public/item-icons
+volumes:
+  dashy-icons:

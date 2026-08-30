@@ -1,0 +1,28 @@
+# Beszel 服务器监控（monitor.fireflyiv.com → 127.0.0.1:8706）
+# hub 负责 UI 与数据；agent 以 host 网络跑在本机采集系统指标（SSH 公钥授权）
+services:
+  beszel:
+    image: ghcr.io/henrygd/beszel:latest
+    container_name: beszel
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8706:8090"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - beszel-data:/beszel_data
+  beszel-agent:
+    image: ghcr.io/henrygd/beszel-agent:latest
+    container_name: beszel-agent
+    restart: unless-stopped
+    network_mode: host
+    pid: host
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /:/host:ro
+    environment:
+      PORT: 45876
+      KEY: "KEY_PLACEHOLDER"
+      FILESYSTEM: /dev/vda2
+volumes:
+  beszel-data:

@@ -1,0 +1,32 @@
+pageInfo:
+  title: FireflyIv 导航
+  description: 萤火小站全部分站入口
+appConfig:
+  theme: adventure
+  layout: auto
+  iconSize: medium
+  language: zh-CN
+  startingView: default
+sections:
+  - name: 博客
+    items:
+      - { title: 主站首页, url: https://www.fireflyiv.com, icon: favicon }
+      - { title: 全部文章, url: https://www.fireflyiv.com/posts, icon: favicon }
+      - { title: 碎碎念, url: https://www.fireflyiv.com/chatter, icon: favicon }
+      - { title: 归档, url: https://www.fireflyiv.com/archive, icon: favicon }
+  - name: 内容服务
+    items:
+      - { title: 图床, url: https://i.fireflyiv.com, icon: favicon }
+      - { title: 短链管理, url: https://shlink.fireflyiv.com, icon: favicon }
+      - { title: 笔记, url: https://note.fireflyiv.com, icon: favicon }
+      - { title: 粘贴板, url: https://paste.fireflyiv.com, icon: favicon }
+  - name: 数据与监控
+    items:
+      - { title: 访问统计, url: https://stats.fireflyiv.com, icon: favicon }
+      - { title: 公开状态页, url: https://status.fireflyiv.com, icon: favicon }
+      - { title: 可用性监控, url: https://uptime-kuma.fireflyiv.com, icon: favicon }
+      - { title: 服务器监控, url: https://monitor.fireflyiv.com, icon: favicon }
+      - { title: 一言 API, url: https://api.fireflyiv.com, icon: favicon }
+  - name: 订阅
+    items:
+      - { title: RSS 订阅, url: https://www.fireflyiv.com/feed.xml, icon: favicon }

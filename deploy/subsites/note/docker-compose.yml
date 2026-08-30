@@ -1,0 +1,12 @@
+# 笔记（note.fireflyiv.com → 127.0.0.1:8712）
+services:
+  memos:
+    image: ghcr.nju.edu.cn/usememos/memos:latest
+    container_name: memos
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8712:5230"
+    volumes:
+      - memos-data:/var/opt/memos
+volumes:
+  memos-data:

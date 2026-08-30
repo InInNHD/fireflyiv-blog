@@ -1,0 +1,30 @@
+# shlink 短链（go.fireflyiv.com → 127.0.0.1:8704）+ 管理前端（admin.go.fireflyiv.com → 127.0.0.1:8705）
+services:
+  shlink:
+    image: shlinkio/shlink:stable
+    container_name: shlink
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8704:8080"
+    environment:
+      DEFAULT_DOMAIN: go.fireflyiv.com
+      DB_DRIVER: sqlite
+      DB_NAME: /data/db.sqlite
+      IS_HTTPS_ENABLED: "true"
+      TIMEZONE: Asia/Shanghai
+      DEFAULT_BASE_URL_REDIRECT: https://www.fireflyiv.com
+      DEFAULT_REGULAR_404_REDIRECT: https://www.fireflyiv.com
+      DEFAULT_INVALID_SHORT_URL_REDIRECT: https://www.fireflyiv.com
+    volumes:
+      - shlink-data:/data
+  shlink-web-client:
+    image: shlinkio/shlink-web-client:latest
+    container_name: shlink-web
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8705:8080"
+    environment:
+      - SHLINK_SERVER_URL=https://go.fireflyiv.com
+      - SHLINK_SERVER_API_KEY=${SHLINK_API_KEY:-}
+volumes:
+  shlink-data:

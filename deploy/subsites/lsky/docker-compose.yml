@@ -1,0 +1,12 @@
+# 兰空图床（i.fireflyiv.com → 127.0.0.1:8703）
+services:
+  lsky:
+    image: lskyorg/lsky-pro:latest
+    container_name: lsky
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8703:80"
+    volumes:
+      - lsky-data:/var/www/html/storage
+volumes:
+  lsky-data:

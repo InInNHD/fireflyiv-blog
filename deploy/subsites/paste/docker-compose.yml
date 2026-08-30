@@ -1,0 +1,14 @@
+# 粘贴板（paste.fireflyiv.com → 127.0.0.1:8711）
+services:
+  privatebin:
+    image: privatebin/nginx-fpm-alpine:latest
+    container_name: privatebin
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8711:8080"
+    read_only: true
+    volumes:
+      - paste-data:/srv/data
+      - ./conf.php:/srv/cfg/conf.php:ro
+volumes:
+  paste-data:

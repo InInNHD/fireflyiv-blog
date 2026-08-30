@@ -1,0 +1,17 @@
+# Vaultwarden 密码库（vault.fireflyiv.com → 127.0.0.1:8713）
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8713:80"
+    environment:
+      - DOMAIN=https://vault.fireflyiv.com
+      - SIGNUPS_ALLOWED=false
+      - SIGNUPS_VERIFY=false
+      - WEBSOCKET_ENABLED=true
+    volumes:
+      - vaultwarden-data:/data
+volumes:
+  vaultwarden-data:

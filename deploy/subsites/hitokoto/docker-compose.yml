@@ -1,0 +1,36 @@
+# 一言 API（api.fireflyiv.com → 127.0.0.1:8702）
+services:
+  hitokoto:
+    image: hitokoto/api:latest
+    container_name: hitokoto
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8702:8000"
+    environment:
+      NODE_ENV: production
+      TZ: Asia/Shanghai
+      redis.host: hitokoto-redis
+      redis.port: "6379"
+      url: https://api.fireflyiv.com
+      api_name: fireflyiv-01
+      workers: "2"
+      extensions.netease: "false"
+    volumes:
+      - hitokoto-data:/usr/src/app/data
+    depends_on:
+      hitokoto-redis:
+        condition: service_healthy
+  hitokoto-redis:
+    image: redis:alpine
+    container_name: hitokoto-redis
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - hitokoto-redis-data:/data
+volumes:
+  hitokoto-data:
+  hitokoto-redis-data:
