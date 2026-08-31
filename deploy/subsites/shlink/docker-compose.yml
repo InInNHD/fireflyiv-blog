@@ -1,4 +1,4 @@
-# shlink 短链（go.fireflyiv.com → 127.0.0.1:8704）+ 管理前端（admin.go.fireflyiv.com → 127.0.0.1:8705）
+# shlink 短链（go.fireflyiv.com → 127.0.0.1:8704）+ 管理前端（shlink.fireflyiv.com → 127.0.0.1:8705）
 services:
   shlink:
     image: shlinkio/shlink:stable
@@ -25,6 +25,7 @@ services:
       - "127.0.0.1:8705:8080"
     environment:
       - SHLINK_SERVER_URL=https://go.fireflyiv.com
-      - SHLINK_SERVER_API_KEY=${SHLINK_API_KEY:-}
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf:ro
 volumes:
   shlink-data:
