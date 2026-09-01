@@ -5,17 +5,17 @@ const db = new sqlite3.Database(dbPath);
 
 const monitors = [
   ["主站 www", "keyword", "https://www.fireflyiv.com", "FireflyIv", null, null],
-  ["评论 talk", "keyword", "https://talk.fireflyiv.com", "Artalk", null, null],
+  ["评论 talk", "keyword", "http://127.0.0.1:1234", "Artalk", null, null],
   ["统计 stats", "keyword", "https://stats.fireflyiv.com", "Umami", null, null],
   ["一言 api", "json-query", "https://api.fireflyiv.com", null, "$type($)", "object"],
   ["图床 i", "keyword", "https://i.fireflyiv.com", "Lsky Pro", null, null],
   ["短链 go", "keyword", "https://go.fireflyiv.com", "FireflyIv", null, null],
-  ["短链管理 shlink", "keyword", "https://shlink.fireflyiv.com", "Shlink", null, null],
+  ["短链管理 shlink", "keyword", "http://127.0.0.1:8705", "Shlink", null, null],
   ["粘贴板 paste", "keyword", "https://paste.fireflyiv.com", "FireflyIv 粘贴板", null, null],
   ["笔记 note", "keyword", "https://note.fireflyiv.com", "Memos", null, null],
-  ["可用性监控 uptime-kuma", "keyword", "https://uptime-kuma.fireflyiv.com", "Uptime Kuma", null, null],
+  ["可用性监控 uptime-kuma", "keyword", "http://127.0.0.1:3001", "Uptime Kuma", null, null],
   ["公开状态页 status", "keyword", "https://status.fireflyiv.com/status/firefly", "FireflyIv 服务状态", null, null],
-  ["服务器监控 monitor", "keyword", "https://monitor.fireflyiv.com", "Beszel", null, null],
+  ["服务器监控 monitor", "keyword", "http://127.0.0.1:8706", "Beszel", null, null],
   ["导航站 nav", "keyword", "https://nav.fireflyiv.com/conf.yml", "FireflyIv 导航", null, null],
   ["密码库 vault", "keyword", "https://vault.fireflyiv.com", "Vaultwarden Web", null, null],
 ];
@@ -43,13 +43,13 @@ async function main() {
     const ids = [];
     for (let weight = 0; weight < monitors.length; weight += 1) {
       const [name, type, url, keyword, jsonPath, expectedValue] = monitors[weight];
-      const existing = await get("SELECT id FROM monitor WHERE url = ? ORDER BY id LIMIT 1", [url]);
+      const existing = await get("SELECT id FROM monitor WHERE name = ? ORDER BY id LIMIT 1", [name]);
       let id = existing?.id;
 
       if (id) {
         await run(
-          "UPDATE monitor SET name = ?, type = ?, keyword = ?, json_path = ?, expected_value = ?, active = 1, interval = 60, accepted_statuscodes_json = ? WHERE id = ?",
-          [name, type, keyword, jsonPath, expectedValue, '["200-299","301","302"]', id],
+          "UPDATE monitor SET name = ?, type = ?, url = ?, keyword = ?, json_path = ?, expected_value = ?, active = 1, interval = 60, accepted_statuscodes_json = ? WHERE id = ?",
+          [name, type, url, keyword, jsonPath, expectedValue, '["200-299","301","302"]', id],
         );
       } else {
         const result = await run(
