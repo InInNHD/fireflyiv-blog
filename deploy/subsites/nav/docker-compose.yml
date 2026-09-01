@@ -13,7 +13,7 @@ services:
           cpus: "0.5"
           memory: 256M
     volumes:
-      - ./conf.yml:/app/public/conf.yml
+      - ./conf.yml:/app/user-data/conf.yml:ro
       - dashy-icons:/app/public/item-icons
 volumes:
   dashy-icons:
