@@ -17,6 +17,13 @@ services:
       - SIGNUPS_ALLOWED=false
       - SIGNUPS_VERIFY=false
       - WEBSOCKET_ENABLED=true
+      - IP_HEADER=CF-Connecting-IP
+      - LOGIN_RATELIMIT_SECONDS=60
+      - LOGIN_RATELIMIT_MAX_BURST=5
+      - UNAUTHENTICATED_RATELIMIT_SECONDS=60
+      - UNAUTHENTICATED_RATELIMIT_MAX_BURST=20
+      - ADMIN_RATELIMIT_SECONDS=300
+      - ADMIN_RATELIMIT_MAX_BURST=3
     volumes:
       - vaultwarden-data:/data
 volumes:

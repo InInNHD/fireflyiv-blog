@@ -66,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <BackToTop />
         <Fireflies />
         <Nav />
-        <main className="mx-auto w-full max-w-4xl flex-1 px-4 pb-16">{children}</main>
+        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16">{children}</main>
         <footer className="border-t border-line px-4 py-8 text-center text-sm text-muted">
           <nav aria-label="分站导航" className="mb-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
             <a href="https://stats.fireflyiv.com" target="_blank" rel="noreferrer" className="transition-colors hover:text-accent">📊 统计</a>

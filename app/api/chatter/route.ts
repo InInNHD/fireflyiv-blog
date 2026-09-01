@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { listChatter, insertChatter } from "@/lib/db";
+import { countChatter, listChatter, insertChatter } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -11,7 +11,7 @@ export async function GET(req: Request) {
   const before = rawBefore && /^\d+$/.test(rawBefore) ? Number(rawBefore) : undefined;
   const limit = Math.min(Math.max(Number(rawLimit) || 20, 1), 50);
   const { items, nextBefore } = listChatter(before, limit);
-  return NextResponse.json({ items, nextBefore });
+  return NextResponse.json({ items, nextBefore, total: countChatter() });
 }
 
 // 简单内存限流：key -> 时间戳数组（每分钟最多 5 条）

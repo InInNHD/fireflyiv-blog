@@ -8,7 +8,7 @@ const lastSubmit = new Map<string, number>();
 
 async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
   const secret = process.env.TURNSTILE_SECRET_KEY;
-  if (!secret) return true;
+  if (!secret) return false;
   if (!token) return false;
   try {
     const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
@@ -23,6 +23,9 @@ async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
 }
 
 export async function POST(request: Request) {
+  if (!process.env.TURNSTILE_SECRET_KEY) {
+    return Response.json({ ok: false, error: "友链申请暂未开放" }, { status: 503 });
+  }
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
   let body: Record<string, unknown>;
   try {

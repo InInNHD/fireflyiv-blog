@@ -3,10 +3,9 @@
   "nick": "FireflyIv",
   "slogan": "萤火虽微，愿为其芒",
   "description": "一个自托管在腾讯云的个人博客。记录技术、生活与零碎想法，内容全部以 Markdown 保存在 Git 仓库中。",
-  "avatar": "🪰",
+  "avatar": "https://github.com/InInNHD.png?size=160",
   "social": {
-    "github": "https://github.com/fireflyiv",
-    "bilibili": "https://space.bilibili.com",
+    "github": "https://github.com/InInNHD",
     "email": "hi@fireflyiv.com",
     "rss": "/feed.xml"
   },

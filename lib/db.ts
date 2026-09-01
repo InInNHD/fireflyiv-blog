@@ -50,6 +50,11 @@ export function listChatter(before?: number, limit = 20): { items: ChatterItem[]
   return { items, nextBefore };
 }
 
+export function countChatter(): number {
+  const row = getDb().prepare("SELECT COUNT(*) AS total FROM chatter").get() as { total: number };
+  return row.total;
+}
+
 function normalizeChatter(row: unknown): ChatterItem {
   const item = row as Omit<ChatterItem, "tags"> & { tags: string };
   let tags: string[] = [];

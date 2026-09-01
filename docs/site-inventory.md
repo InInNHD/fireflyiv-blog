@@ -48,7 +48,7 @@
 | talk.fireflyiv.com | Artalk 评论 | 1234 | 博客评论区，管理后台同址 |
 | i.fireflyiv.com | Lsky Pro 图床 | 8703 | SQLite 落卷；策略 URL 已修公网；上传限 100M |
 | go.fireflyiv.com | Shlink 短链 | 8704 | 无效访问 302 回主站；SQLite |
-| shlink.fireflyiv.com | 短链管理面板 | 8705 | 免登录（API key 内置） |
+| shlink.fireflyiv.com | 短链管理面板 | 8705 | 首屏不预置服务器或 API key；`servers.json` 禁止匿名读取 |
 | api.fireflyiv.com | Hitokoto 一言 API | 8702 | 句子库 1 万条自建 Redis；CORS 全开；主站已切换使用 |
 | paste.fireflyiv.com | PrivateBin 粘贴板 | 8711 | 数据落卷持久化 |
 | note.fireflyiv.com | Memos 笔记 | 8712 | 首次打开初始化管理员（fireflyiv） |
@@ -57,7 +57,7 @@
 | 子域 | 服务 | 端口 | 说明 |
 |---|---|---|---|
 | stats.fireflyiv.com | Umami 统计 | 8700 | Postgres 内网(172.17.0.1:8731)；主站已埋点 |
-| uptime-kuma.fireflyiv.com | 可用性监控 | 3001 | 8 个监控项，60s 探测 |
+| uptime-kuma.fireflyiv.com | 可用性监控 | 3001 | 14 个内容探针，60s 探测；裸域跳转另行验收 |
 | status.fireflyiv.com | 公开状态页 | 8708 | nginx 反代 kuma /status/firefly |
 | monitor.fireflyiv.com | Beszel 服务器监控 | 8707→8706 | systemd 二进制 + agent 45876；nginx 反代修复 chunked 问题 |
 
@@ -98,7 +98,7 @@
 - 保留 7 天轮转；异地同步（COS/对象存储）待配
 
 ### 监控
-- 可用性：uptime-kuma 8 项（主站/裸域/评论/统计/一言/图床/短链/短链面板）
+- 可用性：Uptime Kuma 14 项功能探针；页面检查稳定特征，一言 API 校验 JSON 对象，导航检查实际配置文件
 - 服务器：Beszel（CPU/内存/磁盘/网络/11 容器指标，agent 令牌可扩展多机）
 - 访问统计：Umami（主站埋点，文章 PV 直查展示）
 - ⚠️ 告警通知渠道未配（邮件/Webhook 待办）

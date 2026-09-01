@@ -1,95 +1,146 @@
 import Link from "next/link";
-import PostCard from "@/components/post-card";
 import Hitokoto from "@/components/hitokoto";
+import HomeSearchTrigger from "@/components/home-search-trigger";
+import PostCard from "@/components/post-card";
 import { getListedPosts } from "@/lib/blog";
-import { getAnimeData, getSiteInfo } from "@/lib/site";
+import { countChatter, listChatter } from "@/lib/db";
+import { getAnimeData, getGallery, getMusicData, getSiteInfo } from "@/lib/site";
 
+export const dynamic = "force-dynamic";
 
-export const dynamic = "force-static";
+async function getServiceStatus() {
+  try {
+    const [configResponse, heartbeatResponse] = await Promise.all([
+      fetch("https://status.fireflyiv.com/api/status-page/firefly", {
+        next: { revalidate: 60 },
+        signal: AbortSignal.timeout(2500),
+      }),
+      fetch("https://status.fireflyiv.com/api/status-page/heartbeat/firefly", {
+        next: { revalidate: 60 },
+        signal: AbortSignal.timeout(2500),
+      }),
+    ]);
+    if (!configResponse.ok || !heartbeatResponse.ok) throw new Error("status api failed");
+    const config = await configResponse.json();
+    const heartbeat = await heartbeatResponse.json();
+    const total = config.publicGroupList?.[0]?.monitorList?.length ?? 0;
+    const latest = Object.values(heartbeat.heartbeatList ?? {}).map((items) =>
+      Array.isArray(items) ? items.at(-1) : null,
+    );
+    const up = latest.filter(
+      (item) => item && typeof item === "object" && "status" in item && item.status === 1,
+    ).length;
+    return { up, total };
+  } catch {
+    return null;
+  }
+}
 
-export default function HomePage() {
+export default async function HomePage() {
   const site = getSiteInfo();
+  const allPosts = getListedPosts();
+  const posts = allPosts.slice(0, 4);
   const anime = getAnimeData();
-  const posts = getListedPosts().slice(0, 6);
+  const gallery = getGallery();
+  const music = getMusicData();
+  const chatter = listChatter(undefined, 1).items[0];
+  const chatterCount = countChatter();
   const watching = anime.items.find((item) => item.status === "watching");
-  const now = [
-    { icon: "📺", label: "追番", value: watching?.title ?? "片单持续更新", href: "/anime" },
-    site.now?.game ? { icon: "🎮", label: "在玩", value: site.now.game } : null,
-    { icon: "🎧", label: "在听", value: site.now?.music || "打开音乐与歌词", href: "/music" },
-    site.now?.note ? { icon: "✨", label: "近况", value: site.now.note } : null,
-  ].filter(Boolean) as { icon: string; label: string; value: string; href?: string }[];
+  const currentTrack = music.tracks[0];
+  const serviceStatus = await getServiceStatus();
 
   return (
-    <div className="space-y-10 pt-10">
-      {/* 英雄区 */}
-      <section className="glass-panel glass-feature relative overflow-hidden px-6 py-12 text-center sm:py-16">
-        <div
-          className="pointer-events-none absolute inset-0 opacity-60"
-          style={{
-            background:
-              "radial-gradient(400px 200px at 20% 0%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 70%), radial-gradient(400px 220px at 85% 100%, color-mix(in srgb, var(--accent2) 12%, transparent), transparent 70%)",
-          }}
-        />
-        <div className="relative">
-          <div className="mx-auto mb-5 size-20 rounded-2xl bg-surface2 text-4xl shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_35%,transparent)] grid place-items-center">
-            ✦
+    <div className="space-y-6 pt-6 sm:pt-8">
+      <HomeSearchTrigger />
+
+      <section className="grid gap-4 lg:grid-cols-[1.35fr_0.85fr]" aria-label="个人简介与当前音乐">
+        <article className="glass-panel glass-feature overflow-hidden p-5 sm:p-6">
+          <div className="flex items-center gap-4 sm:gap-5">
+            <img
+              src={site.avatar}
+              alt={`${site.nick} 的头像`}
+              className="size-20 shrink-0 rounded-2xl border border-line object-cover shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_22%,transparent)] sm:size-24"
+              referrerPolicy="no-referrer"
+            />
+            <div className="min-w-0 flex-1">
+              <p className="text-xs uppercase tracking-[0.24em] text-accent">Hello, I am</p>
+              <h1 className="text-glow mt-1 text-2xl font-bold sm:text-3xl">{site.nick}</h1>
+              <p className="mt-1 text-sm text-muted">{site.slogan}</p>
+              <p className="mt-2 line-clamp-2 max-w-2xl text-sm leading-relaxed text-muted sm:mt-3">{site.description}</p>
+            </div>
           </div>
-          <h1 className="text-glow text-3xl font-bold sm:text-4xl">
-            {site.name}
-          </h1>
-          <p className="mt-3 text-muted">{site.slogan}</p>
-          <Hitokoto className="mx-auto mt-3 max-w-md" />
-          <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted">
-            {site.description}
-          </p>
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
-            <Link href="/posts" className="btn-accent">
-              阅读文章
-            </Link>
-            <Link href="/chatter" className="btn-accent" style={{ color: "var(--accent2)", borderColor: "color-mix(in srgb, var(--accent2) 40%, var(--line))" }}>
-              看看碎碎念
-            </Link>
+          <Hitokoto className="mt-4 hidden max-w-2xl sm:block" />
+          <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+            <Link href="/posts" className="rounded-xl bg-surface2 px-2 py-3"><strong className="block text-lg text-accent">{allPosts.length}</strong><span className="text-xs text-muted">文章</span></Link>
+            <Link href="/chatter" className="rounded-xl bg-surface2 px-2 py-3"><strong className="block text-lg text-accent">{chatterCount}</strong><span className="text-xs text-muted">动态</span></Link>
+            <Link href="/gallery" className="rounded-xl bg-surface2 px-2 py-3"><strong className="block text-lg text-accent">{gallery.length}</strong><span className="text-xs text-muted">相册</span></Link>
+          </div>
+          <div className="mt-4 flex flex-wrap gap-2">
+            {site.social.github && <a href={site.social.github} target="_blank" rel="noreferrer" className="chip">GitHub ↗</a>}
+            {site.social.email && <a href={`mailto:${site.social.email}`} className="chip">Email</a>}
+            {site.social.rss && <a href={site.social.rss} className="chip">RSS</a>}
+          </div>
+        </article>
+
+        <article className="glass-panel flex min-h-48 flex-col justify-between overflow-hidden p-5 sm:min-h-64 sm:p-6">
+          <div>
+            <p className="text-xs uppercase tracking-[0.24em] text-accent">Now playing</p>
+            <div className="mt-3 grid size-16 place-items-center rounded-full border-[6px] border-bg bg-surface2 text-2xl shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_18%,transparent)] sm:mt-5 sm:size-20 sm:border-[7px] sm:text-3xl">♫</div>
+            <h2 className="mt-3 text-xl font-semibold sm:mt-5">{currentTrack?.title ?? "歌单等待点亮"}</h2>
+            <p className="mt-1 text-sm text-muted">{currentTrack?.artist ?? "只展示你合法托管的音频"}</p>
+          </div>
+          {currentTrack ? (
+            <audio className="mt-5 w-full" controls preload="metadata" src={currentTrack.src}>当前浏览器不支持音频播放。</audio>
+          ) : (
+            <Link href="/music" className="btn-accent mt-3 w-fit sm:mt-5">打开音乐与歌词 →</Link>
+          )}
+        </article>
+      </section>
+
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="站点近况">
+        <Link href="/chatter" className="glass-panel glass-panel-hover min-h-40 p-5 lg:col-span-2">
+          <p className="text-xs text-accent">最新碎碎念</p>
+          <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted">{chatter?.content ?? "暂时还没有动态，真实记录会从这里开始。"}</p>
+          <span className="mt-4 inline-block text-xs text-muted">共 {chatterCount} 条 →</span>
+        </Link>
+        <Link href="/gallery" className="glass-panel glass-panel-hover min-h-40 overflow-hidden p-5">
+          <p className="text-xs text-accent">最近相册</p>
+          {gallery[0] ? (
+            <>
+              <p className="mt-4 font-medium">{gallery[0].caption ?? gallery[0].alt}</p>
+              <p className="mt-2 text-xs text-muted">{gallery[0].date ?? "查看相册"} →</p>
+            </>
+          ) : <p className="mt-4 text-sm leading-relaxed text-muted">等待加入真实照片，不再使用文章封面充数。</p>}
+        </Link>
+        <Link href="/anime" className="glass-panel glass-panel-hover min-h-40 p-5">
+          <p className="text-xs text-accent">正在追番</p>
+          <p className="mt-4 font-medium">{watching?.title ?? "片单待整理"}</p>
+          <p className="mt-2 text-xs text-muted">{watching?.progress ?? `${anime.items.length} 部记录`} →</p>
+        </Link>
+        <a href="https://status.fireflyiv.com" target="_blank" rel="noreferrer" className="glass-panel glass-panel-hover min-h-32 p-5 sm:col-span-2 lg:col-span-1">
+          <p className="text-xs text-accent">服务状态</p>
+          <p className="mt-3 text-2xl font-semibold">{serviceStatus ? `${serviceStatus.up}/${serviceStatus.total}` : "查看状态"}</p>
+          <p className="mt-1 text-xs text-muted">{serviceStatus && serviceStatus.up === serviceStatus.total ? "全部服务正常" : "打开实时状态页 →"}</p>
+        </a>
+        <div className="glass-panel min-h-32 p-5 sm:col-span-2 lg:col-span-3">
+          <p className="text-xs text-accent">最近状态</p>
+          <div className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
+            <Link href="/anime" className="rounded-xl bg-surface2 p-3"><span className="text-muted">📺 追番</span><strong className="mt-1 block">{watching?.title ?? "片单持续更新"}</strong></Link>
+            <Link href="/music" className="rounded-xl bg-surface2 p-3"><span className="text-muted">🎧 在听</span><strong className="mt-1 block">{currentTrack?.title ?? "歌单待更新"}</strong></Link>
+            <div className="rounded-xl bg-surface2 p-3"><span className="text-muted">✨ 近况</span><strong className="mt-1 block">{site.now?.note ?? "持续建设中"}</strong></div>
           </div>
         </div>
       </section>
 
-      <section aria-labelledby="now-title">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 id="now-title" className="text-xl font-semibold">最近状态</h2>
-          <Link href="/anime" className="chip">完整片单 →</Link>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {now.map((item) => {
-            const card = <><span className="text-2xl" aria-hidden>{item.icon}</span><span><span className="block text-xs text-muted">{item.label}</span><span className="mt-0.5 block text-sm">{item.value}</span></span></>;
-            return item.href
-              ? <Link key={item.label} href={item.href} className="glass-panel glass-panel-hover flex items-center gap-3 p-4">{card}</Link>
-              : <div key={item.label} className="glass-panel flex items-center gap-3 p-4">{card}</div>;
-          })}
-        </div>
-      </section>
-
-      {/* 最新文章 */}
       <section>
         <div className="mb-4 flex items-center justify-between">
           <h2 className="text-xl font-semibold">最新文章</h2>
-          <Link href="/posts" className="chip">
-            全部 →
-          </Link>
+          <Link href="/posts" className="chip">全部文章 →</Link>
         </div>
-        {posts.length === 0 ? (
-          <div className="card p-8 text-center text-muted">
-            还没有文章，快写下第一篇吧 ✍️
-          </div>
-        ) : (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {posts.map((p) => (
-              <PostCard key={p.slug} post={p} />
-            ))}
-          </div>
-        )}
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {posts.map((post) => <PostCard key={post.slug} post={post} />)}
+        </div>
       </section>
-
-
     </div>
   );
 }

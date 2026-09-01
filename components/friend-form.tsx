@@ -40,6 +40,17 @@ export default function FriendForm({ email, turnstileSiteKey }: { email?: string
     (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) =>
       setForm((f) => ({ ...f, [k]: e.target.value }));
 
+  if (!turnstileSiteKey) {
+    return (
+      <div className="glass-panel p-5 text-center">
+        <p className="text-sm text-fg">友链表单正在配置人机验证</p>
+        <p className="mt-2 text-xs text-muted">
+          启用前不会接收未验证提交；{email ? <a className="text-accent" href={`mailto:${email}`}>可先通过邮件联系</a> : "请稍后再试"}。
+        </p>
+      </div>
+    );
+  }
+
   if (state === "done") {
     return (
       <div className="glass-panel p-5 text-center">
@@ -97,12 +108,8 @@ export default function FriendForm({ email, turnstileSiteKey }: { email?: string
       <button type="submit" disabled={state === "sending"} className="btn-accent disabled:opacity-40">
         {state === "sending" ? "提交中…" : "✉️ 提交申请"}
       </button>
-      {turnstileSiteKey && (
-        <>
-          <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="lazyOnload" />
-          <div className="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="auto" />
-        </>
-      )}
+      <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="lazyOnload" />
+      <div className="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="auto" />
       {error && <p className="text-xs text-red-400">{error}</p>}
     </form>
   );

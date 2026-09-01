@@ -7,19 +7,19 @@ pinned: false
 comment: true
 tags: ["Next.js:nextjs", "前端:frontend"]
 cover: /covers/blog-stack.svg
-description: 复刻 XinghuisamaBlogs 式体验：Next.js 15 + React 19 + Tailwind v4，卡片流、双主题、星空萤火背景。
+description: 参考优秀个人站的内容组织方式，用 Next.js 16 + React 19 + Tailwind v4 实现卡片流、双主题与星空萤火背景。
 ---
 
 ## 选型一览
 
 | 层 | 技术 |
 |---|---|
-| 框架 | Next.js 15（App Router） |
+| 框架 | Next.js 16（App Router） |
 | 语言 | TypeScript（strict） |
 | 样式 | Tailwind CSS v4 + CSS 变量双主题 |
 | 内容 | Markdown + frontmatter（gray-matter 解析） |
 | Markdown 渲染 | unified + remark-parse + remark-gfm + rehype-slug + rehype-shiki（shiki 双主题高亮） |
-| 部署 | Docker + Caddy + Cloudflare Tunnel |
+| 部署 | Docker + Nginx + Cloudflare Tunnel |
 
 ## 主题设计
 

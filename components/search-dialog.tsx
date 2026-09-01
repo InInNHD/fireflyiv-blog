@@ -69,7 +69,11 @@ export default function SearchDialog() {
       }
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    window.addEventListener("firefly:open-search", openDialog);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      window.removeEventListener("firefly:open-search", openDialog);
+    };
   }, [openDialog, closeDialog]);
 
   useEffect(() => {
