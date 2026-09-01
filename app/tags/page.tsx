@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllTags } from "@/lib/blog";
 
-export const metadata: Metadata = { title: "标签" };
+export const metadata: Metadata = { title: "标签", alternates: { canonical: "/tags" } };
 
 export default function TagsPage() {
   const tags = getAllTags();

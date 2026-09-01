@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface SearchPost {
   slug: string;
@@ -7,6 +7,8 @@ interface SearchPost {
   description: string;
   date: string;
   tags: { name: string; slug: string }[];
+  category?: { name: string; slug: string };
+  series?: { name: string; slug: string };
   content: string;
 }
 
@@ -24,9 +26,12 @@ export default function SearchDialog() {
   const [hits, setHits] = useState<Hit[]>([]);
   const [loaded, setLoaded] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const openerRef = useRef<HTMLElement | null>(null);
   const abortRef = useRef<AbortController | null>(null);
 
-  const openDialog = async () => {
+  const openDialog = useCallback(async () => {
+    openerRef.current = document.activeElement as HTMLElement | null;
     setOpen(true);
     if (!index && !loaded) {
       try {
@@ -43,12 +48,13 @@ export default function SearchDialog() {
         setLoaded(true);
       }
     }
-  };
+  }, [index, loaded]);
 
-  const closeDialog = () => {
+  const closeDialog = useCallback(() => {
     setOpen(false);
     setQuery("");
-  };
+    window.setTimeout(() => openerRef.current?.focus(), 0);
+  }, []);
 
   // 快捷键：/ 打开（输入框聚焦时除外），Esc 关闭
   useEffect(() => {
@@ -64,13 +70,27 @@ export default function SearchDialog() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [openDialog, closeDialog]);
 
   useEffect(() => {
     if (open) {
       const t = window.setTimeout(() => inputRef.current?.focus(), 40);
-      return () => window.clearTimeout(t);
+      const trapFocus = (e: KeyboardEvent) => {
+        if (e.key !== "Tab" || !dialogRef.current) return;
+        const focusable = dialogRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        );
+        if (!focusable.length) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+      };
+      document.addEventListener("keydown", trapFocus);
+      return () => {
+        window.clearTimeout(t);
+        document.removeEventListener("keydown", trapFocus);
+      };
     }
   }, [open]);
 
@@ -95,11 +115,13 @@ export default function SearchDialog() {
       const title = p.title.toLowerCase();
       const desc = p.description.toLowerCase();
       const tags = p.tags.map((t) => t.name.toLowerCase()).join(" ");
+      const groups = `${p.category?.name ?? ""} ${p.series?.name ?? ""}`.toLowerCase();
       const content = p.content.toLowerCase();
       let score = 0;
       let ok = true;
       for (const term of terms) {
         if (title.includes(term)) score += 8;
+        else if (groups.includes(term)) score += 6;
         else if (tags.includes(term)) score += 5;
         else if (desc.includes(term)) score += 3;
         else if (content.includes(term)) score += 1;
@@ -134,22 +156,26 @@ export default function SearchDialog() {
           onClick={closeDialog}
         >
           <div
+            ref={dialogRef}
             role="dialog"
             aria-modal="true"
             aria-label="站内搜索"
             className="card w-full max-w-xl overflow-hidden !bg-surface/90 p-0"
             onClick={(e) => e.stopPropagation()}
           >
-            <label className="flex items-center gap-2 border-b border-line px-4 py-3">
-              <span aria-hidden className="text-accent">✦</span>
-              <input
-                ref={inputRef}
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="搜索文章标题 / 标签 / 内容…（Esc 关闭）"
-                className="w-full bg-transparent text-sm outline-none placeholder:text-muted"
-              />
-            </label>
+            <div className="flex items-center border-b border-line pr-2">
+              <label className="flex flex-1 items-center gap-2 px-4 py-3">
+                <span aria-hidden className="text-accent">✦</span>
+                <input
+                  ref={inputRef}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="搜索文章标题 / 分类 / 内容…"
+                  className="w-full bg-transparent text-sm outline-none placeholder:text-muted"
+                />
+              </label>
+              <button type="button" onClick={closeDialog} aria-label="关闭搜索" className="chip size-8 justify-center !p-0 text-base">×</button>
+            </div>
             <div className="max-h-[55vh] overflow-y-auto p-2">
               {!query.trim() ? (
                 <p className="px-3 py-6 text-center text-sm text-muted">输入关键词，全站全文搜索</p>

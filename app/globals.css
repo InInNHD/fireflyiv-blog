@@ -54,6 +54,9 @@ body {
   transition: background-color 0.4s ease, color 0.3s ease;
 }
 
+.site-nav-links { scrollbar-width: none; }
+.site-nav-links::-webkit-scrollbar { display: none; }
+
 /* 星空背景：多层星点 + 底部渐变 */
 body::before {
   content: "";
@@ -118,6 +121,288 @@ html.light body::before {
 .card-hover:hover {
   border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
   transform: translateY(-2px);
+}
+
+/* 高透明度玻璃层：用于首页、友链与音乐等展示型模块 */
+.glass-panel {
+  position: relative;
+  border: 1px solid color-mix(in srgb, white 14%, var(--line));
+  border-radius: 1.4rem;
+  background:
+    linear-gradient(145deg, color-mix(in srgb, white 8%, transparent), transparent 48%),
+    color-mix(in srgb, var(--surface) 88%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, white 10%, transparent),
+    0 18px 50px color-mix(in srgb, black 22%, transparent);
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+}
+
+html.light .glass-panel {
+  border-color: rgba(255, 255, 255, 0.82);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.3)),
+    var(--surface);
+  box-shadow: inset 0 1px 0 white, 0 18px 45px rgba(30, 50, 80, 0.1);
+}
+
+.glass-feature {
+  background:
+    radial-gradient(500px 220px at 0% 0%, color-mix(in srgb, var(--accent) 13%, transparent), transparent 65%),
+    radial-gradient(420px 220px at 100% 100%, color-mix(in srgb, var(--accent2) 10%, transparent), transparent 68%),
+    linear-gradient(145deg, color-mix(in srgb, white 7%, transparent), transparent 52%),
+    color-mix(in srgb, var(--surface) 90%, transparent);
+}
+
+.glass-panel-hover {
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-panel-hover:hover {
+  transform: translateY(-4px) scale(1.008);
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+  box-shadow: 0 22px 55px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.link-avatar {
+  border: 1px solid color-mix(in srgb, var(--accent) 24%, var(--line));
+  background: linear-gradient(145deg, color-mix(in srgb, var(--accent) 12%, var(--surface2)), var(--surface2));
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* ========== 音乐与同步歌词 ========== */
+@keyframes record-spin {
+  to { transform: rotate(360deg); }
+}
+
+.music-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.88fr) minmax(0, 1.35fr);
+  gap: 1.25rem;
+  isolation: isolate;
+}
+
+.music-ambient {
+  position: absolute;
+  inset: 4% 6%;
+  z-index: -1;
+  border-radius: 45%;
+  background-position: center;
+  background-size: cover;
+  filter: blur(70px) saturate(1.4);
+  opacity: 0.18;
+}
+
+.music-control {
+  min-height: 34rem;
+  padding: 2.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.music-cover {
+  width: min(13rem, 58vw);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 10px solid color-mix(in srgb, var(--bg) 74%, black);
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle, var(--accent2) 0 4%, transparent 4.5% 14%, color-mix(in srgb, var(--accent) 26%, var(--surface2)) 15% 100%);
+  color: var(--accent);
+  font-size: 3rem;
+  box-shadow: 0 0 0 1px var(--line), 0 20px 45px rgba(0, 0, 0, 0.28);
+  animation: record-spin 16s linear infinite paused;
+}
+
+.music-cover.is-playing { animation-play-state: running; }
+.music-cover img { width: 100%; height: 100%; object-fit: cover; }
+
+.music-range {
+  width: 100%;
+  height: 4px;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+.music-play,
+.music-skip {
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+
+.music-play {
+  width: 3.8rem;
+  height: 3.8rem;
+  padding-left: 0.12rem;
+  border: 1px solid color-mix(in srgb, var(--accent) 58%, var(--line));
+  background: color-mix(in srgb, var(--accent) 20%, var(--surface2));
+  color: var(--accent);
+  box-shadow: 0 0 28px color-mix(in srgb, var(--accent) 20%, transparent);
+  font-size: 1.15rem;
+}
+
+.music-skip {
+  width: 2.7rem;
+  height: 2.7rem;
+  border: 1px solid var(--line);
+  background: var(--surface2);
+  color: var(--muted);
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.music-play:hover,
+.music-skip:hover { transform: scale(1.08); color: var(--accent); }
+.music-play:focus-visible,
+.music-skip:focus-visible,
+.music-tabs button:focus-visible,
+.music-lyrics button:focus-visible,
+.music-playlist button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.music-detail {
+  height: 34rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.music-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: 13rem;
+  margin: 1.25rem auto 0;
+  padding: 0.25rem;
+  border: 1px solid var(--line);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--bg) 28%, var(--surface2));
+}
+
+.music-tabs button {
+  padding: 0.45rem 0.9rem;
+  border-radius: 9999px;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.music-tabs button[aria-selected="true"] {
+  background: color-mix(in srgb, var(--accent) 20%, var(--surface2));
+  color: var(--accent);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.music-lyrics,
+.music-playlist {
+  min-height: 0;
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--accent) 36%, transparent) transparent;
+}
+
+.music-lyrics {
+  padding: 14rem 1.5rem;
+  mask-image: linear-gradient(to bottom, transparent, black 24%, black 76%, transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 24%, black 76%, transparent);
+}
+
+.music-lyrics button {
+  display: block;
+  width: 100%;
+  padding: 0.65rem 0.5rem;
+  color: color-mix(in srgb, var(--muted) 48%, transparent);
+  text-align: center;
+  line-height: 1.6;
+  cursor: pointer;
+  transition: color 0.35s ease, transform 0.35s ease, font-size 0.35s ease;
+}
+
+.music-lyrics button:hover { color: var(--muted); }
+.music-lyrics button.active {
+  color: var(--accent);
+  font-size: 1.18rem;
+  font-weight: 700;
+  transform: scale(1.04);
+  text-shadow: 0 0 22px color-mix(in srgb, var(--accent) 32%, transparent);
+}
+
+.music-no-lyric {
+  display: grid;
+  min-height: 6rem;
+  place-items: center;
+  color: var(--muted);
+  text-align: center;
+}
+
+.music-guide {
+  min-height: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding: 2rem;
+  color: color-mix(in srgb, var(--muted) 56%, transparent);
+  text-align: center;
+}
+
+.music-guide p:first-child { color: var(--accent); font-size: 1.05rem; font-weight: 700; }
+.music-guide code { padding: 0.15rem 0.4rem; border-radius: 0.4rem; background: var(--surface2); color: var(--muted); }
+
+.music-playlist { padding: 1rem 1.25rem 1.5rem; }
+.music-playlist button {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.music-playlist button:hover { background: var(--surface2); }
+.music-playlist button.active {
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
+  background: color-mix(in srgb, var(--accent) 9%, var(--surface2));
+}
+.music-list-index { font-family: var(--font-mono); font-size: 0.75rem; color: var(--muted); }
+
+.music-empty-disc {
+  width: 7rem;
+  height: 7rem;
+  margin: auto;
+  display: grid;
+  place-items: center;
+  border-radius: 9999px;
+  color: var(--accent);
+  font-size: 2rem;
+  background: radial-gradient(circle, var(--accent2) 0 7%, transparent 8% 18%, var(--surface2) 19% 100%);
+  box-shadow: 0 0 30px color-mix(in srgb, var(--accent) 16%, transparent);
+}
+
+@media (max-width: 720px) {
+  .music-stage { grid-template-columns: 1fr; }
+  .music-control { min-height: 30rem; padding: 1.5rem; }
+  .music-detail { height: 29rem; }
+  .music-lyrics { padding-block: 12rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .music-cover { animation: none; }
+  .glass-panel-hover { transition: border-color 0.2s ease; }
+  .glass-panel-hover:hover { transform: none; }
 }
 
 .chip {
@@ -216,12 +501,33 @@ html.light body::before {
 }
 
 .markdown-body pre {
+  position: relative;
   background: #0a0e1d;
   border: 1px solid var(--line);
   border-radius: 0.8rem;
   padding: 1rem 1.2rem;
   overflow-x: auto;
   font-size: 0.875rem;
+}
+
+.code-copy {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.65rem;
+  z-index: 1;
+  border: 1px solid var(--line);
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--bg) 82%, transparent);
+  color: var(--muted);
+  padding: 0.2rem 0.65rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.code-copy:hover,
+.code-copy:focus-visible {
+  color: var(--accent);
+  border-color: var(--accent);
 }
 
 html.light .markdown-body pre {
@@ -240,6 +546,33 @@ html.light .markdown-body pre {
   color: var(--muted);
   background: var(--surface);
   border-radius: 0 0.6rem 0.6rem 0;
+}
+
+.markdown-body .callout {
+  border: 1px solid color-mix(in srgb, var(--accent) 38%, var(--line));
+  border-left-width: 4px;
+  border-radius: 0.8rem;
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface));
+  padding: 0.8rem 1rem;
+}
+
+.markdown-body .callout::before {
+  content: attr(data-label);
+  display: block;
+  margin-bottom: 0.35rem;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.markdown-body .callout-warning,
+.markdown-body .callout-caution {
+  border-color: color-mix(in srgb, var(--accent2) 50%, var(--line));
+  background: color-mix(in srgb, var(--accent2) 9%, var(--surface));
+}
+
+.markdown-body .callout-warning::before,
+.markdown-body .callout-caution::before {
+  color: var(--accent2);
 }
 
 .markdown-body ul,

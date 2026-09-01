@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getArchive } from "@/lib/blog";
 
-export const metadata: Metadata = { title: "归档" };
+export const metadata: Metadata = { title: "归档", alternates: { canonical: "/archive" } };
 
 export default function ArchivePage() {
   const archive = getArchive();

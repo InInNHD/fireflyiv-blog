@@ -15,7 +15,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { tag } = await params;
   const found = getAllTags().find((t) => t.slug === tag);
-  return { title: found ? `#${found.name}` : "# 标签" };
+  return { title: found ? `#${found.name}` : "# 标签", alternates: { canonical: `/tags/${tag}` } };
 }
 
 export default async function TagPage({ params }: Props) {

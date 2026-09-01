@@ -1,6 +1,10 @@
 ---
 title: 你好，萤火
 date: 2026-03-01
+category: "随笔:misc"
+series: "建站手记:site-building"
+pinned: true
+comment: true
 tags: ["随笔:misc", "建站:setup"]
 cover: /covers/hello-firefly.svg
 description: 博客的第一篇文章。说说为什么叫 Firefly，以及这个小站打算写些什么。

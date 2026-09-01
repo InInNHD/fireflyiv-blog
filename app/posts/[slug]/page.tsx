@@ -6,8 +6,10 @@ import PostCover from "@/components/post-cover";
 import PostToc from "@/components/post-toc";
 import ReadingProgress from "@/components/reading-progress";
 import PostViews from "@/components/post-views";
+import CodeCopyButtons from "@/components/code-copy-buttons";
+import PostCard from "@/components/post-card";
 import { renderMarkdown } from "@/lib/markdown";
-import { getAllPosts, getPostBySlug } from "@/lib/blog";
+import { getAllPosts, getPostBySlug, getRelatedPosts } from "@/lib/blog";
 import type { PostMeta } from "@/lib/blog";
 
 interface Props {
@@ -23,21 +25,33 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = getPostBySlug(slug);
   if (!post) return { title: "未找到文章" };
   const SITE_URL = process.env.SITE_URL ?? "https://www.fireflyiv.com";
+  const image = post.cover
+    ? new URL(post.cover, SITE_URL).toString()
+    : new URL(`/posts/${post.slug}/opengraph-image`, SITE_URL).toString();
   return {
     title: post.title,
     description: post.description || undefined,
+    alternates: { canonical: `/posts/${post.slug}` },
     openGraph: {
       title: post.title,
       description: post.description || undefined,
       type: "article",
-      images: post.cover ? [{ url: new URL(post.cover, SITE_URL).toString() }] : undefined,
+      publishedTime: post.date,
+      modifiedTime: post.updated,
+      tags: post.tags.map((tag) => tag.name),
+      images: [{ url: image, width: 1200, height: 630, alt: post.title }],
     },
+    twitter: { card: "summary_large_image", title: post.title, description: post.description, images: [image] },
   };
 }
 
 function fmtDate(d: string): string {
   const [y, m, day] = d.split("-");
   return `${y} 年 ${Number(m)} 月 ${Number(day)} 日`;
+}
+
+function isOutdated(date: string): boolean {
+  return Date.now() - Date.parse(`${date}T00:00:00Z`) > 365 * 24 * 60 * 60 * 1000;
 }
 
 function PrevNextCard({
@@ -72,6 +86,7 @@ export default async function PostPage({ params }: Props) {
   if (!post) notFound();
 
   const html = await renderMarkdown(post.content);
+  const related = getRelatedPosts(post);
 
   // 上一篇（更新的）/ 下一篇（更旧的），按日期倒序
   const posts = getAllPosts();
@@ -113,8 +128,17 @@ export default async function PostPage({ params }: Props) {
           <div className="flex flex-wrap items-center gap-3 text-xs text-muted">
             <time dateTime={post.date}>📅 {fmtDate(post.date)}</time>
             {post.updated && <span>✏️ 更新于 {fmtDate(post.updated)}</span>}
-            <span>📖 {post.content.length > 500 ? "约 " + Math.round(post.content.length / 500) + " 分钟" : "短文"}</span>
+            <span>📖 {post.wordCount} 字 · 约 {post.readingMinutes} 分钟</span>
             <PostViews slug={post.slug} />
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {post.pinned && <span className="chip !text-accent">📌 置顶</span>}
+            {post.category && (
+              <Link href={`/categories/${post.category.slug}`} className="chip">📂 {post.category.name}</Link>
+            )}
+            {post.series && (
+              <Link href={`/series/${post.series.slug}`} className="chip">📚 {post.series.name}</Link>
+            )}
           </div>
           {post.tags.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
@@ -127,7 +151,14 @@ export default async function PostPage({ params }: Props) {
           )}
         </header>
 
+        {isOutdated(post.updated ?? post.date) && (
+          <aside className="rounded-xl border border-accent2/40 bg-accent2/10 px-4 py-3 text-sm text-muted">
+            ⏳ 本文距上次更新已超过一年，部分内容可能已经变化。
+          </aside>
+        )}
+
         <div className="markdown-body" dangerouslySetInnerHTML={{ __html: html }} />
+        <CodeCopyButtons />
 
         <footer className="flex items-center justify-between border-t border-line pt-6 text-sm">
           <Link href="/posts" className="chip">← 返回文章列表</Link>
@@ -140,8 +171,17 @@ export default async function PostPage({ params }: Props) {
           <PrevNextCard label="下一篇（更早的文章） →" post={older} />
         </nav>
 
+        {related.length > 0 && (
+          <section className="space-y-3" aria-labelledby="related-title">
+            <h2 id="related-title" className="text-lg font-semibold">相关文章</h2>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {related.map((item) => <PostCard key={item.slug} post={item} />)}
+            </div>
+          </section>
+        )}
+
         {/* 评论区（Artalk 自托管） */}
-        <ArtalkComments pageKey={post.slug} pageTitle={post.title} />
+        {post.comment && <ArtalkComments pageKey={post.slug} pageTitle={post.title} />}
       </article>
 
       <aside className="hidden min-w-0 lg:block">

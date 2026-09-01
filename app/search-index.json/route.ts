@@ -23,6 +23,8 @@ export function GET() {
     description: p.description,
     date: p.date,
     tags: p.tags,
+    category: p.category,
+    series: p.series,
     content: plainText(p.content),
   }));
   return Response.json({ posts });

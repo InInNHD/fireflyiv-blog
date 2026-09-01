@@ -1,23 +1,26 @@
 # FireflyIv 总站与子站功能清单
-> 整理时间：2026-08-30 · 部署形态：腾讯云 4核4G Ubuntu 24.04 + Docker + Cloudflare Tunnel
+> 整理时间：2026-09-01 · 部署形态：腾讯云 4核4G Ubuntu 24.04 + Docker + Cloudflare Tunnel
 
-## 一、主站 www.fireflyiv.com（Next.js 15 + React 19 + Tailwind v4）
+## 一、主站 www.fireflyiv.com（Next.js 16 + React 19 + Tailwind v4）
 
 ### 内容
-- 文章系统：Markdown 写在 content/posts/，SSG 静态生成，draft 草稿机制
-- 文章页：封面系统（自定义图/自动渐变）、shiki 代码高亮（亮暗双主题）、TOC 目录（滚动高亮）、上一篇/下一篇导航、阅读进度条
+- 文章系统：Markdown 写在 content/posts/，SSG 静态生成，支持草稿、置顶、分类、系列、独立评论开关
+- 文章页：封面系统（自定义图/自动渐变）、shiki 双主题高亮与代码复制、GitHub 风格提示块、TOC、阅读时长、相关文章、过期提示、上一篇/下一篇、阅读进度条
 - 浏览量实显：文章页展示真实 PV（直查 Umami Postgres，5 分钟缓存）
-- 碎碎念 /chatter：SQLite 存储 + Bearer Token 发布 + 心情 emoji + 游标分页
-- 标签 /tags + 归档 /archive（时间线）
-- 友链 /links：卡片展示 + mailto 申请表单
+- 碎碎念 /chatter：SQLite 存储 + Bearer Token 发布 + 心情 emoji + 图片 + 标签 + 独立链接 + 游标分页
+- 标签 /tags + 分类 /categories + 系列 /series + 归档 /archive（时间线）
+- 追番 /anime：观看状态、进度、评分、短评与外链；无条目时显示空状态
+- 音乐 /music：原生音频播放器、歌单切换、LRC 同步滚动与点击跳转歌词
+- 图集 /gallery：内容文件驱动的图集与灯箱
+- 友链 /links：卡片展示 + API 入库申请表单 + 可选 Cloudflare Turnstile 校验
 - 关于 /about
 - RSS /feed.xml（构建期静态生成）
 - sitemap.xml + robots.txt
 
 ### 阅读与交互
-- 站内全文搜索（导航 🔍 按钮 + 快捷键 / 打开，Esc 关闭，分词加权）
+- 站内全文搜索（导航 🔍 按钮 + 快捷键 / 打开，Esc 关闭，分词加权、焦点约束与恢复）
 - Artalk 评论（talk.fireflyiv.com，未配置时优雅降级）
-- 图片灯箱（正文图片点击放大，Esc 关闭）
+- 图片灯箱（正文与图集图片点击放大，Esc 关闭）
 - 返回顶部按钮（滚动 600px 出现）
 
 ### 视觉与动效（Firefly 主题）
@@ -28,12 +31,12 @@
 - 卡片流布局 + 萤光绿/琥珀黄点缀色
 
 ### SEO 与数据
-- og:image（文章封面）、JSON-LD BlogPosting 结构化数据
+- 动态 og:image、canonical、Twitter Card、JSON-LD BlogPosting 结构化数据
 - Umami 埋点统计（stats.fireflyiv.com）
 - PWA manifest（可安装基础版；全量离线 SW 未做）
 
 ### 站点辅助
-- 首页：英雄区 + 自建一言（api.fireflyiv.com，10 分钟缓存）+ 最新 6 篇
+- 首页：玻璃拟态英雄区 + 自建一言（api.fireflyiv.com，10 分钟缓存）+ 最近状态 + 最新 6 篇
 - 页脚：分站导航（统计/图床/短链/一言/RSS）
 - 404 定制页
 
@@ -110,8 +113,8 @@
 
 1. 告警通知（uptime-kuma + Beszel 邮件/Webhook）
 2. 备份异地化（COS/rclone）
-3. 友链表单后端化（现为 mailto）
+3. 补充真实追番条目、个人图集与首页游戏/音乐状态
 4. 全量离线 Service Worker（PWA 完整化）
 5. Memos 完成初始化 + 录入 Vaultwarden
 6. 新子站候选：files.filebrowser / docker.Dockge / git.Gitea
-7. 主站内容：持续写作
+7. 主站内容：持续写作，并逐步整理系列文章

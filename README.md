@@ -1,11 +1,13 @@
 # FireflyIv Blog
 
-萤火虽微，愿为其芒 —— 自托管的个人博客（Next.js 15 + React 19 + Tailwind CSS v4 + SQLite）。
+萤火虽微，愿为其芒 —— 自托管的个人博客（Next.js 16 + React 19 + Tailwind CSS v4 + SQLite）。
 
-- 文章：Markdown 写在 `content/posts/`，构建时静态生成
-- 碎碎念：`/chatter`，SQLite（Node 内置 `node:sqlite`）存储，Bearer Token 鉴权发布
+- 文章：Markdown 写在 `content/posts/`，支持分类、系列、置顶、阅读时长、相关文章、过期提示与独立评论开关
+- 碎碎念：`/chatter`，SQLite（Node 内置 `node:sqlite`）存储，支持图片、标签、独立链接与 Bearer Token 鉴权发布
+- 二次元内容：`/anime` 追番状态、`/music` 原生音频与同步歌词、`/gallery` 图集灯箱、首页「最近状态」
 - 评论：Artalk 自托管（可选，未配置时自动隐藏）
-- 锦上添花：代码高亮（shiki）、RSS、文章目录 + 上一篇/下一篇、站内搜索（`/` 快捷键）、阅读进度条、鼠标萤火拖尾、一言、图片灯箱、友链申请表单、PWA manifest
+- 阅读体验：Shiki 代码高亮与复制、GitHub 风格提示块、RSS、目录、上一篇/下一篇、站内搜索（`/` 快捷键）、阅读进度条、图片灯箱
+- SEO 与安全：动态 OG 图、canonical、Twitter Card、sitemap、友链表单 Turnstile（可选）
 - 部署：Docker + Cloudflare Tunnel（详见 [deploy/README.md](deploy/README.md)）
 
 ## 环境要求
@@ -50,6 +52,8 @@ npm start   # = node .next/standalone/server.js（本地 127.0.0.1:3000）
 | `SITE_URL` | RSS/sitemap/OG 的绝对地址 | 上线前必填 |
 | `CHATTER_TOKEN` | 碎碎念发布 token（页面「🔑 管理员」输入） | 想发碎碎念时必填 |
 | `NEXT_PUBLIC_ARTALK_SERVER` | Artalk 评论服务地址 | 未部署 Artalk 可留空 |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile 站点密钥 | 开启友链反滥用时必填 |
+| `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile 服务端密钥 | 开启友链反滥用时必填 |
 
 ## 写一篇文章
 
@@ -59,21 +63,33 @@ npm start   # = node .next/standalone/server.js（本地 127.0.0.1:3000）
 ---
 title: 文章标题
 date: 2026-03-01
+updated: 2026-09-01                 # 可选，最后更新时间
 tags: ["随笔:misc", "建站:setup"]   # "显示名:ASCII-slug" 或直接写字符串
+category: "建站:setup"              # 可选，单一分类
+series: "建站手记:site-building"    # 可选，系列聚合
 description: 摘要，用于列表页与 SEO
 draft: false                        # true 只在本地可见
+pinned: false                       # 是否置顶
+comment: true                       # 是否显示 Artalk 评论
 ---
 
 正文 Markdown 内容…
 ```
 
-保存后开发模式下立即生效；标签页/归档页/RSS 均自动同步。
+保存后开发模式下立即生效；标签、分类、系列、归档、RSS 与 sitemap 均自动同步。提交前可运行 `npm run check:content` 检查内容格式。
 
 ## 发布碎碎念
 
 1. 设置环境变量 `CHATTER_TOKEN`（任意长随机字符串，如 `openssl rand -hex 24`）；
 2. 重启 dev server；
-3. 打开 `/chatter` -> 点「🔑 管理员」输入同一个 token -> 即可发布（token 保存在浏览器 localStorage）。
+3. 打开 `/chatter` -> 点「🔑 管理员」输入同一个 token -> 即可发布文字、心情、图片与标签（token 保存在浏览器 localStorage）；每条内容可通过时间链接进入独立页面。
+
+## 更新追番、音乐、图集与最近状态
+
+- `content/anime.json`：维护追番条目、状态、进度、评分、封面与短评；未录入时页面显示诚实的空状态。
+- `content/music.json`：维护歌曲标题、歌手、音频、封面和 LRC 歌词；建议将音频放在 `public/music/` 并使用 `/music/文件名.mp3`。
+- `content/gallery.json`：维护图片地址、替代文本、说明与日期，图片会自动接入灯箱。
+- `content/site.json` 的 `now`：维护首页当前游戏、音乐和一句近况。
 
 ## Docker 本地部署
 
@@ -110,9 +126,9 @@ docker compose down -v          # 停止并清除数据卷（慎用）
 
 ```
 app/            # Next.js App Router 页面与 API（含 feed.xml / search-index.json / manifest）
-components/     # 导航/卡片/搜索/进度条/拖尾/灯箱/一言/友链表单/碎碎念/评论 组件
-content/        # 内容即 Git：文章、友链、站点元信息
-lib/            # 文章读取、SQLite 数据层、shiki 高亮插件
+components/     # 导航/卡片/搜索/进度条/灯箱/友链/碎碎念/评论等组件
+content/        # 内容即 Git：文章、追番、音乐、图集、友链、站点元信息
+lib/            # 内容读取、SQLite 数据层、Markdown 与 OG 图生成
 deploy/         # Docker Compose / cloudflared / Caddy 部署文件
 docs/           # 项目设计文档
 ```

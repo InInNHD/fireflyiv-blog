@@ -10,5 +10,10 @@
     "email": "hi@fireflyiv.com",
     "rss": "/feed.xml"
   },
+  "now": {
+    "game": "",
+    "music": "",
+    "note": "片单、游戏与音乐状态会在这里持续更新"
+  },
   "icp": ""
 }

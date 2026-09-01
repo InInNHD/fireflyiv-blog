@@ -65,8 +65,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "content 不能为空" }, { status: 400 });
   }
   const mood = String(body.mood ?? "").trim().slice(0, 16) || undefined;
-  const img = String(body.img ?? "").trim().slice(0, 500) || undefined;
+  const rawImg = String(body.img ?? "").trim().slice(0, 500);
+  if (rawImg && !/^https:\/\//i.test(rawImg) && !/^\/[a-z0-9/_.,%-]+$/i.test(rawImg)) {
+    return NextResponse.json({ error: "图片地址必须是 HTTPS 或站内路径" }, { status: 400 });
+  }
+  const img = rawImg || undefined;
+  const rawTags = Array.isArray(body.tags) ? body.tags : String(body.tags ?? "").split(/[,，]/);
+  const tags = [...new Set(rawTags.map((tag) => String(tag).trim().slice(0, 20)).filter(Boolean))].slice(0, 5);
 
-  const item = insertChatter(content, mood, img);
+  const item = insertChatter(content, mood, img, tags);
   return NextResponse.json(item, { status: 201 });
 }

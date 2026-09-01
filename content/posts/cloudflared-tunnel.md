@@ -1,6 +1,10 @@
 ---
 title: Cloudflare Tunnel 部署笔记
 date: 2026-02-26
+category: "运维:ops"
+series: "建站手记:site-building"
+pinned: false
+comment: true
 tags: ["部署:deploy", "运维:ops"]
 cover: /covers/cloudflared-tunnel.svg
 description: 把博客部署到腾讯云并通过 Cloudflare Tunnel 穿透的经验记录：不暴露端口、自动 HTTPS、内网服务安全访问。

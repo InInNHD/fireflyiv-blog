@@ -21,7 +21,7 @@ export default function ImageLightbox() {
       const target = e.target as HTMLElement | null;
       if (!target || target.tagName !== "IMG") return;
       const img = target as HTMLImageElement;
-      if (!img.closest(".markdown-body")) return;
+      if (!img.closest(".markdown-body, [data-lightbox]")) return;
       e.preventDefault();
       close();
 

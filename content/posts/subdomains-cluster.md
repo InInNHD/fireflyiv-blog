@@ -1,6 +1,10 @@
 ---
 title: 博客分站集群上线：统计、一言、图床、短链
 date: 2026-08-30
+category: "运维:ops"
+series: "建站手记:site-building"
+pinned: false
+comment: true
 tags: ["部署:deploy", "自托管:selfhost"]
 cover: https://i.fireflyiv.com/i/2026/08/30/6a9324ddada4b.png
 description: 记录给 fireflyiv.com 加上 stats / api / i / go 四个子域分站的完整过程：Cloudflare Tunnel 接入、镜像拉取踩坑、以及四个服务的调优细节。

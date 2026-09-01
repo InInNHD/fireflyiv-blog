@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import Script from "next/script";
 
 // 友链申请：POST 到 /api/friend-request（入库 + 邮件通知站长）
-export default function FriendForm({ email }: { email?: string }) {
+export default function FriendForm({ email, turnstileSiteKey }: { email?: string; turnstileSiteKey?: string }) {
   const [form, setForm] = useState({ name: "", url: "", avatar: "", desc: "" });
   const [state, setState] = useState<"idle" | "sending" | "done" | "error">("idle");
   const [error, setError] = useState("");
@@ -13,22 +14,25 @@ export default function FriendForm({ email }: { email?: string }) {
     if (state === "sending") return;
     setState("sending");
     setError("");
+    const turnstileToken = String(new FormData(e.currentTarget as HTMLFormElement).get("cf-turnstile-response") ?? "");
     try {
       const res = await fetch("/api/friend-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, turnstileToken }),
       });
       const d = await res.json().catch(() => null);
       if (!res.ok || !d?.ok) {
         setError(d?.error ?? "提交失败，请稍后再试");
         setState("error");
+        (window as any).turnstile?.reset();
         return;
       }
       setState("done");
     } catch {
       setError("网络异常，也可以直接邮件联系：" + (email ?? ""));
       setState("error");
+      (window as any).turnstile?.reset();
     }
   };
 
@@ -38,7 +42,7 @@ export default function FriendForm({ email }: { email?: string }) {
 
   if (state === "done") {
     return (
-      <div className="card p-5 text-center">
+      <div className="glass-panel p-5 text-center">
         <p className="text-lg">✨</p>
         <p className="mt-2 text-sm text-fg">申请已提交！</p>
         <p className="mt-1 text-xs text-muted">我会尽快查看并添加，感谢互换友链。</p>
@@ -47,7 +51,7 @@ export default function FriendForm({ email }: { email?: string }) {
   }
 
   return (
-    <form onSubmit={submit} className="card space-y-3 p-5">
+    <form onSubmit={submit} className="glass-panel space-y-3 p-5">
       <p className="text-sm leading-relaxed text-muted">
         想交换友链？填好下面的信息提交，我会尽快审核添加。
       </p>
@@ -93,6 +97,12 @@ export default function FriendForm({ email }: { email?: string }) {
       <button type="submit" disabled={state === "sending"} className="btn-accent disabled:opacity-40">
         {state === "sending" ? "提交中…" : "✉️ 提交申请"}
       </button>
+      {turnstileSiteKey && (
+        <>
+          <Script src="https://challenges.cloudflare.com/turnstile/v0/api.js" strategy="lazyOnload" />
+          <div className="cf-turnstile" data-sitekey={turnstileSiteKey} data-theme="auto" />
+        </>
+      )}
       {error && <p className="text-xs text-red-400">{error}</p>}
     </form>
   );

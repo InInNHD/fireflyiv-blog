@@ -9,6 +9,7 @@ services:
       dockerfile: deploy/Dockerfile
       args:
         NEXT_PUBLIC_ARTALK_SERVER: ${NEXT_PUBLIC_ARTALK_SERVER:-https://talk.fireflyiv.com}
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
     container_name: fireflyiv-web
     restart: unless-stopped
     # 只绑 127.0.0.1：公网入口完全交给 cloudflared 隧道
@@ -32,6 +33,8 @@ services:
       - SITE_URL=https://www.fireflyiv.com
       - CHATTER_TOKEN=${CHATTER_TOKEN:-change-me-to-a-long-random-string}
       - NEXT_PUBLIC_ARTALK_SERVER=${NEXT_PUBLIC_ARTALK_SERVER:-https://talk.fireflyiv.com}
+      - NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY:-}
+      - TURNSTILE_SECRET_KEY=${TURNSTILE_SECRET_KEY:-}
       - UMAMI_PG_URL=${UMAMI_PG_URL:-}
       - UMAMI_WEBSITE_ID=bbfbe70a-b862-4e6b-b1f1-b369a6cbacec
       - SMTP_HOST=smtp.qq.com

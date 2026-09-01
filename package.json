@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "node .next/standalone/server.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "check:content": "node scripts/check-content.mjs"
   },
   "dependencies": {
     "artalk": "^2.10.0",

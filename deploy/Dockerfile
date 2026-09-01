@@ -6,7 +6,9 @@ WORKDIR /app
 
 # NEXT_PUBLIC_* 变量在 next build 时才注入前端产物，必须作为构建参数传入
 ARG NEXT_PUBLIC_ARTALK_SERVER=https://talk.fireflyiv.com
-ENV NEXT_PUBLIC_ARTALK_SERVER=$NEXT_PUBLIC_ARTALK_SERVER
+ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY=
+ENV NEXT_PUBLIC_ARTALK_SERVER=$NEXT_PUBLIC_ARTALK_SERVER \
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY=$NEXT_PUBLIC_TURNSTILE_SITE_KEY
 
 COPY package.json package-lock.json* ./
 RUN npm ci --no-audit --no-fund
@@ -28,7 +30,8 @@ ENV NODE_ENV=production \
     PORT=3000 \
     HOSTNAME=0.0.0.0 \
     SITE_URL=https://www.fireflyiv.com \
-    NEXT_PUBLIC_ARTALK_SERVER=https://talk.fireflyiv.com
+    NEXT_PUBLIC_ARTALK_SERVER=https://talk.fireflyiv.com \
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY=
 
 # standalone 产物：服务端代码 + 公共资源
 COPY --from=builder /app/.next/standalone ./

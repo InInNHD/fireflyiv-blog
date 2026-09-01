@@ -1,6 +1,10 @@
 ---
 title: 本站技术栈与设计
 date: 2026-02-28
+category: "技术:tech"
+series: "建站手记:site-building"
+pinned: false
+comment: true
 tags: ["Next.js:nextjs", "前端:frontend"]
 cover: /covers/blog-stack.svg
 description: 复刻 XinghuisamaBlogs 式体验：Next.js 15 + React 19 + Tailwind v4，卡片流、双主题、星空萤火背景。

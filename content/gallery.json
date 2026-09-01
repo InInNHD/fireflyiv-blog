@@ -1,0 +1,20 @@
+[
+  {
+    "src": "/covers/hello-firefly.svg",
+    "alt": "你好，萤火文章封面",
+    "caption": "小站的第一束萤火",
+    "date": "2026-03-01"
+  },
+  {
+    "src": "/covers/blog-stack.svg",
+    "alt": "本站技术栈文章封面",
+    "caption": "构成小站的技术与设计",
+    "date": "2026-02-28"
+  },
+  {
+    "src": "/covers/cloudflared-tunnel.svg",
+    "alt": "Cloudflare Tunnel 部署文章封面",
+    "caption": "连接云端与萤火小站",
+    "date": "2026-02-26"
+  }
+]

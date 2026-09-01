@@ -14,6 +14,11 @@ export interface SiteInfo {
     rss?: string;
   };
   icp?: string;
+  now?: {
+    game?: string;
+    music?: string;
+    note?: string;
+  };
 }
 
 export interface FriendLink {
@@ -21,6 +26,43 @@ export interface FriendLink {
   url: string;
   avatar: string;
   desc: string;
+}
+
+export type AnimeStatus = "watching" | "completed" | "planned" | "paused";
+
+export interface AnimeItem {
+  title: string;
+  status: AnimeStatus;
+  progress?: string;
+  rating?: number;
+  cover?: string;
+  comment?: string;
+  url?: string;
+}
+
+export interface AnimeData {
+  intro: string;
+  items: AnimeItem[];
+}
+
+export interface GalleryItem {
+  src: string;
+  alt: string;
+  caption?: string;
+  date?: string;
+}
+
+export interface MusicTrack {
+  title: string;
+  artist: string;
+  src: string;
+  cover?: string;
+  lyrics?: string;
+}
+
+export interface MusicData {
+  intro: string;
+  tracks: MusicTrack[];
 }
 
 function readJson<T>(file: string): T {
@@ -34,4 +76,16 @@ export function getSiteInfo(): SiteInfo {
 
 export function getFriendLinks(): FriendLink[] {
   return readJson<FriendLink[]>("links.json");
+}
+
+export function getAnimeData(): AnimeData {
+  return readJson<AnimeData>("anime.json");
+}
+
+export function getGallery(): GalleryItem[] {
+  return readJson<GalleryItem[]>("gallery.json");
+}
+
+export function getMusicData(): MusicData {
+  return readJson<MusicData>("music.json");
 }

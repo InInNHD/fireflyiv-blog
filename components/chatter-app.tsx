@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 
-interface ChatterItem { id: number; content: string; mood: string | null; img: string | null; created_at: number }
+interface ChatterItem { id: number; content: string; mood: string | null; img: string | null; tags: string[]; created_at: number }
 
 const MOODS = ["✨", "🦋", "☕", "🌙", "🐟", "🎮", "📚", "💤"];
 
@@ -28,6 +29,8 @@ export default function ChatterApp() {
   const [token, setToken] = useState<string>("");
   const [draft, setDraft] = useState("");
   const [mood, setMood] = useState<string | null>(null);
+  const [img, setImg] = useState("");
+  const [tagDraft, setTagDraft] = useState("");
   const [posting, setPosting] = useState(false);
   const [showTokenBox, setShowTokenBox] = useState(false);
   const tokenInput = useRef<HTMLInputElement>(null);
@@ -80,7 +83,7 @@ export default function ChatterApp() {
       const res = await fetch("/api/chatter", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ content, mood }),
+        body: JSON.stringify({ content, mood, img: img.trim(), tags: tagDraft.split(/[,，]/) }),
       });
       if (res.status === 401) {
         setError("token 无效，请重新设置");
@@ -95,6 +98,8 @@ export default function ChatterApp() {
       setItems((prev) => [item, ...prev]);
       setDraft("");
       setMood(null);
+      setImg("");
+      setTagDraft("");
     } catch (e) {
       setError(e instanceof Error ? e.message : "发布失败");
     } finally {
@@ -114,6 +119,12 @@ export default function ChatterApp() {
           disabled={!token}
           className="w-full resize-none rounded-xl border border-line bg-surface2 p-3 text-sm outline-none placeholder:text-muted focus:border-accent"
         />
+        {token && (
+          <div className="mt-2 grid gap-2 sm:grid-cols-2">
+            <input value={img} onChange={(e) => setImg(e.target.value)} type="url" placeholder="图片 HTTPS 地址（可选）" className="rounded-xl border border-line bg-surface2 px-3 py-2 text-sm outline-none placeholder:text-muted focus:border-accent" />
+            <input value={tagDraft} onChange={(e) => setTagDraft(e.target.value)} placeholder="标签，用逗号分隔（最多 5 个）" className="rounded-xl border border-line bg-surface2 px-3 py-2 text-sm outline-none placeholder:text-muted focus:border-accent" />
+          </div>
+        )}
         <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
           <div className="flex flex-wrap gap-1">
             {MOODS.map((m) => (
@@ -166,7 +177,7 @@ export default function ChatterApp() {
       {/* 时间线 */}
       <div className="relative space-y-4 before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-px before:bg-line">
         {items.map((it) => (
-          <article key={it.id} className="card relative p-4 pl-10">
+          <article key={it.id} data-lightbox className="card relative p-4 pl-10">
             <span className="absolute left-0 top-5 size-3.5 rounded-full bg-accent shadow-[0_0_8px_color-mix(in_srgb,var(--accent)_70%,transparent)] grid place-items-center text-[7px] text-bg">
               ✦
             </span>
@@ -174,8 +185,12 @@ export default function ChatterApp() {
               {it.mood && <span className="mr-1.5">{it.mood}</span>}
               {it.content}
             </p>
-            {it.img && <img src={it.img} alt="" className="mt-2 max-h-64 rounded-xl border border-line" />}
-            <time className="mt-2 block font-mono text-xs text-muted">{timeAgo(it.created_at)}</time>
+            {it.img && <img src={it.img} alt={`${it.content.slice(0, 40)} 的配图`} loading="lazy" className="mt-2 max-h-64 cursor-zoom-in rounded-xl border border-line" />}
+            {it.tags?.length > 0 && <div className="mt-2 flex flex-wrap gap-1">{it.tags.map((tag) => <span key={tag} className="chip"># {tag}</span>)}</div>}
+            <div className="mt-2 flex items-center justify-between gap-3 font-mono text-xs text-muted">
+              <time>{timeAgo(it.created_at)}</time>
+              <Link href={`/chatter/${it.id}`} className="transition-colors hover:text-accent" aria-label="打开这条碎碎念的独立页面">#{it.id}</Link>
+            </div>
           </article>
         ))}
       </div>

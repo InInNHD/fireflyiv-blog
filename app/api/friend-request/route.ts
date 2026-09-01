@@ -6,15 +6,24 @@ export const dynamic = "force-dynamic";
 // 简单内存限流：每 IP 60 秒最多 1 条（单实例足够）
 const lastSubmit = new Map<string, number>();
 
+async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return true;
+  if (!token) return false;
+  try {
+    const response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      body: new URLSearchParams({ secret, response: token, remoteip: ip }),
+    });
+    const result = await response.json() as { success?: boolean };
+    return result.success === true;
+  } catch {
+    return false;
+  }
+}
+
 export async function POST(request: Request) {
   const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  const now = Date.now();
-  const last = lastSubmit.get(ip) ?? 0;
-  if (now - last < 60_000) {
-    return Response.json({ ok: false, error: "提交太频繁，请稍后再试" }, { status: 429 });
-  }
-  lastSubmit.set(ip, now);
-
   let body: Record<string, unknown>;
   try {
     body = await request.json();
@@ -29,6 +38,17 @@ export async function POST(request: Request) {
   if (!name || !/^https?:\/\/.+/i.test(url)) {
     return Response.json({ ok: false, error: "请填写站点名与合法的 URL" }, { status: 400 });
   }
+
+  if (!await verifyTurnstile(String(body.turnstileToken ?? ""), ip)) {
+    return Response.json({ ok: false, error: "人机验证失败，请刷新后重试" }, { status: 400 });
+  }
+
+  const now = Date.now();
+  const last = lastSubmit.get(ip) ?? 0;
+  if (now - last < 60_000) {
+    return Response.json({ ok: false, error: "提交太频繁，请稍后再试" }, { status: 429 });
+  }
+  lastSubmit.set(ip, now);
 
   insertFriendRequest(name, url, avatar || undefined, desc || undefined);
 

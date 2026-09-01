@@ -13,9 +13,15 @@ export interface PostMeta {
   date: string; // YYYY-MM-DD
   updated?: string;
   tags: Tag[];
+  category?: Tag;
+  series?: Tag;
   description: string;
   draft: boolean;
+  pinned: boolean;
+  comment: boolean;
   cover?: string;
+  wordCount: number;
+  readingMinutes: number;
 }
 
 export interface Post extends PostMeta {
@@ -50,6 +56,26 @@ function parseTags(v: unknown): Tag[] {
   return tags;
 }
 
+function parseGroup(v: unknown): Tag | undefined {
+  if (typeof v !== "string") return undefined;
+  return parseTags([v])[0];
+}
+
+export function readingStats(markdown: string): { wordCount: number; readingMinutes: number } {
+  const text = markdown
+    .replace(/```[\s\S]*?```/g, " ")
+    .replace(/`[^`]*`/g, " ")
+    .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+    .replace(/\[([^\]]*)\]\([^)]*\)/g, "$1")
+    .replace(/[>#*_~|\-]/g, " ");
+  const cjk = text.match(/[\u3400-\u9fff]/g)?.length ?? 0;
+  const words = text.replace(/[\u3400-\u9fff]/g, " ").match(/[\p{L}\p{N}]+/gu)?.length ?? 0;
+  return {
+    wordCount: cjk + words,
+    readingMinutes: Math.max(1, Math.ceil(cjk / 300 + words / 200)),
+  };
+}
+
 function normalizeDate(v: unknown): string {
   if (typeof v === "string") return v;
   if (v instanceof Date && !Number.isNaN(v.getTime())) {
@@ -79,15 +105,21 @@ export function getAllPosts(): Post[] {
       continue;
     }
 
+    const stats = readingStats(content);
     posts.push({
       slug,
       title: String(meta.title ?? slug),
       date,
-      updated: typeof meta.updated === "string" ? meta.updated : undefined,
+      updated: normalizeDate(meta.updated) || undefined,
       tags: parseTags(meta.tags),
+      category: parseGroup(meta.category),
+      series: parseGroup(meta.series),
       description: String(meta.description ?? ""),
       draft: meta.draft === true,
+      pinned: meta.pinned === true,
+      comment: meta.comment !== false,
       cover: typeof meta.cover === "string" ? meta.cover : undefined,
+      ...stats,
       content,
     });
   }
@@ -98,12 +130,52 @@ export function getAllPosts(): Post[] {
     .sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
+export function getListedPosts(): Post[] {
+  return [...getAllPosts()].sort((a, b) => Number(b.pinned) - Number(a.pinned));
+}
+
 export function getPostBySlug(slug: string): Post | null {
   return getAllPosts().find((p) => p.slug === slug) ?? null;
 }
 
 export interface TagWithCount extends Tag {
   count: number;
+}
+
+function countGroups(groups: (Tag | undefined)[]): TagWithCount[] {
+  const map = new Map<string, { name: string; count: number }>();
+  for (const group of groups) {
+    if (!group) continue;
+    const current = map.get(group.slug) ?? { name: group.name, count: 0 };
+    map.set(group.slug, { name: group.name, count: current.count + 1 });
+  }
+  return [...map.entries()]
+    .map(([slug, value]) => ({ slug, ...value }))
+    .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+}
+
+export function getAllCategories(): TagWithCount[] {
+  return countGroups(getAllPosts().map((post) => post.category));
+}
+
+export function getAllSeries(): TagWithCount[] {
+  return countGroups(getAllPosts().map((post) => post.series));
+}
+
+export function getRelatedPosts(post: Post, limit = 3): Post[] {
+  return getAllPosts()
+    .filter((candidate) => candidate.slug !== post.slug)
+    .map((candidate) => ({
+      candidate,
+      score:
+        (post.series && candidate.series?.slug === post.series.slug ? 5 : 0) +
+        (post.category && candidate.category?.slug === post.category.slug ? 3 : 0) +
+        candidate.tags.filter((tag) => post.tags.some((own) => own.slug === tag.slug)).length,
+    }))
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score || (a.candidate.date < b.candidate.date ? 1 : -1))
+    .slice(0, limit)
+    .map(({ candidate }) => candidate);
 }
 
 export function getAllTags(): TagWithCount[] {

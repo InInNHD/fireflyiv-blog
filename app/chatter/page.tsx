@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import ChatterApp from "@/components/chatter-app";
 import Hitokoto from "@/components/hitokoto";
 
-export const metadata: Metadata = { title: "碎碎念" };
+export const metadata: Metadata = { title: "碎碎念", alternates: { canonical: "/chatter" } };
 
 export default function ChatterPage() {
   return (

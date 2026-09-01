@@ -3,6 +3,7 @@
 > 参照项目：[XinghuisamaBlogs](https://github.com/heiehiehi/XinghuisamaBlogs)（[在线站点](https://www.xinghuisama.top)，碎碎念页 /chatter）
 > 目标部署：腾讯云服务器 + 域名 www.fireflyiv.com + tunnel 穿透
 > 文档版本：v0.1（设计稿）
+> 实现状态：2026-09-01 已升级至 Next.js 16，并完成第一阶段（内容模型、阅读体验、SEO、无障碍、友链防滥用）与第二阶段（追番、图集、最近状态、碎碎念增强）；下文保留为历史设计依据。
 
 ---
 

@@ -20,6 +20,7 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s · ${site.name}`,
     },
     description: site.description,
+    alternates: { canonical: "/" },
     openGraph: {
       type: "website",
       locale: "zh_CN",
@@ -28,6 +29,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title: `${site.name} — ${site.slogan}`,
       description: site.description,
     },
+    twitter: { card: "summary_large_image", title: `${site.name} — ${site.slogan}`, description: site.description },
   };
 }
 

@@ -5,9 +5,14 @@ import SearchDialog from "./search-dialog";
 const LINKS = [
   { href: "/", label: "首页" },
   { href: "/posts", label: "文章" },
+  { href: "/categories", label: "分类" },
   { href: "/tags", label: "标签" },
+  { href: "/series", label: "系列" },
   { href: "/archive", label: "归档" },
   { href: "/chatter", label: "碎碎念" },
+  { href: "/anime", label: "追番" },
+  { href: "/music", label: "音乐" },
+  { href: "/gallery", label: "相册" },
   { href: "/links", label: "友链" },
   { href: "/about", label: "关于" },
 ];
@@ -15,12 +20,12 @@ const LINKS = [
 export default function Nav() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-bg/70 backdrop-blur-md">
-      <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link href="/" className="flex items-center gap-2 text-lg font-bold tracking-wide">
           <span className="inline-block size-2.5 rounded-full bg-accent shadow-[0_0_10px_2px_color-mix(in_srgb,var(--accent)_60%,transparent)]" />
           <span className="text-glow">Firefly<span className="text-accent">Iv</span></span>
         </Link>
-        <nav className="flex items-center gap-1 overflow-x-auto text-sm whitespace-nowrap">
+        <nav className="site-nav-links flex items-center gap-1 overflow-x-auto text-sm whitespace-nowrap">
           {LINKS.map((l) => (
             <Link
               key={l.href}

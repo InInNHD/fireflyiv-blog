@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import PostCard from "@/components/post-card";
-import { getAllPosts } from "@/lib/blog";
+import { getListedPosts } from "@/lib/blog";
 
-export const metadata: Metadata = { title: "文章" };
+export const metadata: Metadata = { title: "文章", alternates: { canonical: "/posts" } };
 
 export default function PostsPage() {
-  const posts = getAllPosts();
+  const posts = getListedPosts();
 
   return (
     <div className="space-y-6 pt-8">
