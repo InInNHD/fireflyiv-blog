@@ -36,11 +36,11 @@ npm run dev
 
 ### 生产模式（模拟线上效果）
 
-> ⚠️ 本项目为 `output: "standalone"`，**不支持 `next start`**（Next 15.5+ 会直接报错），请用下面的方式：
+> 本项目为 `output: "standalone"`；`npm start` = `node .next/standalone/server.js`（不使用 `next start`）：
 
 ```bash
 npm run build
-cd .next/standalone && PORT=3000 HOSTNAME=127.0.0.1 node server.js
+npm start   # = node .next/standalone/server.js（本地 127.0.0.1:3000）
 ```
 
 ## 环境变量（.env.local）
@@ -77,7 +77,7 @@ draft: false                        # true 只在本地可见
 
 ## Docker 本地部署
 
-> 容器内使用 Node 24（内置 sqlite）；主机侧端口已避开 Windows Hyper-V 排除段，web 映射到 **8080**。
+> 容器内使用 Node 24（内置 sqlite）；主机侧端口已避开 Windows Hyper-V 排除段，web 映射到 **8082**（与服务器现网一致）。
 
 ```bash
 cd deploy
@@ -91,7 +91,7 @@ docker compose up -d --build
 
 | 服务 | 访问地址 | 说明 |
 |---|---|---|
-| 博客 | http://127.0.0.1:8080 | Next.js 主站 |
+| 博客 | http://127.0.0.1:8082 | Next.js 主站 |
 | Artalk 评论 | http://127.0.0.1:1234 | 评论后端（首次启动自动生成配置） |
 
 数据持久化在 Docker volume：`deploy_fireflyiv-data`（碎碎念 SQLite）与 `deploy_fireflyiv-artalk`（评论）。

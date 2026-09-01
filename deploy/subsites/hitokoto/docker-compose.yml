@@ -1,11 +1,17 @@
 # 一言 API（api.fireflyiv.com → 127.0.0.1:8702）
+# 镜像按 sha256 摘要固定（2026-09-01 快照，与服务器现网一致）；升级时替换摘要，见 deploy/README.md「月度升级」
 services:
   hitokoto:
-    image: hitokoto/api:latest
+    image: hitokoto/api@sha256:dd9fb62aaa9cec14c2a6183afd7278b78b3baff6cb8ad009b7ab3715f87d30e5
     container_name: hitokoto
     restart: unless-stopped
     ports:
       - "127.0.0.1:8702:8000"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
     environment:
       NODE_ENV: production
       TZ: Asia/Shanghai
@@ -21,9 +27,14 @@ services:
       hitokoto-redis:
         condition: service_healthy
   hitokoto-redis:
-    image: redis:alpine
+    image: redis:alpine@sha256:becdda6c7f4b3fb42e42fd7f120bbf5c54c4caaaf16f26da24e4563d2c1f0576
     container_name: hitokoto-redis
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s

@@ -9,7 +9,7 @@ ARG NEXT_PUBLIC_ARTALK_SERVER=https://talk.fireflyiv.com
 ENV NEXT_PUBLIC_ARTALK_SERVER=$NEXT_PUBLIC_ARTALK_SERVER
 
 COPY package.json package-lock.json* ./
-RUN npm install --no-audit --no-fund
+RUN npm ci --no-audit --no-fund
 
 COPY . .
 

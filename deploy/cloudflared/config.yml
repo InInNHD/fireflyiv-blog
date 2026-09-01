@@ -8,9 +8,9 @@ tunnel: fireflyiv
 credentials-file: /etc/cloudflared/fireflyiv.json
 
 ingress:
-  # 博客主站（容器端口映射：主机 8080 -> 容器 3000）
+  # 博客主站（容器端口映射：主机 8082 -> 容器 3000）
   - hostname: www.fireflyiv.com
-    service: http://127.0.0.1:8080
+    service: http://127.0.0.1:8082
   # Artalk 评论服务（可选，独立子域）
   # - hostname: talk.fireflyiv.com
   #   service: http://127.0.0.1:1234

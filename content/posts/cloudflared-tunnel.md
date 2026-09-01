@@ -22,7 +22,7 @@ Cloudflare Tunnel（cloudflared）的思路是：**服务器主动向外发起�
 ```text
 访客 → www.fireflyiv.com (Cloudflare 边缘)
               ↓ 隧道
-        cloudflared → 127.0.0.1:3000 (Next.js)
+        cloudflared → 127.0.0.1:8082 (Next.js)
                     → 127.0.0.1:1234 (Artalk 评论)
 ```
 

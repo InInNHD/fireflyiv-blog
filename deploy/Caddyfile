@@ -1,13 +1,13 @@
 # Caddy 反代（可选）
 # 场景：cloudflared 以纯 HTTP 方式入站、TLS 由本机终结时使用；
 # 若 Cloudflare 边缘已终结 TLS（默认推荐），本文件可省略，
-# cloudflared 直接指到 127.0.0.1:3000 即可。
+# cloudflared 直接指到 127.0.0.1:8082 即可。
 
 www.fireflyiv.com {
-    reverse_proxy 127.0.0.1:3000
+    reverse_proxy 127.0.0.1:8082
 }
 
 # Artalk 后台（可选）
 talk.fireflyiv.com {
-    reverse_proxy 127.0.0.1:23366
+    reverse_proxy 127.0.0.1:1234
 }

@@ -1,11 +1,17 @@
 # Vaultwarden 密码库（vault.fireflyiv.com → 127.0.0.1:8713）
+# 镜像按 sha256 摘要固定（2026-09-01 快照，与服务器现网一致）；升级时替换摘要，见 deploy/README.md「月度升级」
 services:
   vaultwarden:
-    image: vaultwarden/server:latest
+    image: vaultwarden/server@sha256:094b5689ed81549bd293418395c7cf495ae9d960fc2d4928cef2083ef913d912
     container_name: vaultwarden
     restart: unless-stopped
     ports:
       - "127.0.0.1:8713:80"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
     environment:
       - DOMAIN=https://vault.fireflyiv.com
       - SIGNUPS_ALLOWED=false

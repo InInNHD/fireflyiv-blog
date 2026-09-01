@@ -1,6 +1,7 @@
 # FireflyIv Blog 部署编排
 # 用法：在 deploy/ 目录执行 docker compose up -d --build
 # 说明：web 构建上下文为代码根目录（..），artalk 直接拉官方镜像
+# 镜像策略：第三方镜像按 sha256 摘要固定（2026-09-01 快照，与服务器现网一致），升级时替换摘要即可；web 由源码构建。
 services:
   web:
     build:
@@ -11,9 +12,20 @@ services:
     container_name: fireflyiv-web
     restart: unless-stopped
     # 只绑 127.0.0.1：公网入口完全交给 cloudflared 隧道
-    # 注：8080 在本机/服务器均被其他服务占用，统一改用 8082（与其他项目互不干扰）
     ports:
       - "127.0.0.1:8082:3000"
+    # 资源上限：4G 小主机上防止单容器拖垮整机
+    deploy:
+      resources:
+        limits:
+          cpus: "1.5"
+          memory: 1G
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
@@ -30,16 +42,21 @@ services:
       - fireflyiv-data:/app/data
 
   artalk:
-    image: artalk/artalk-go:latest
+    # artalk-go 2.x（2026-09-01 固定摘要；升级见 deploy/README.md「月度升级」）
+    image: artalk/artalk-go@sha256:ed51450f3ed744780efd0d796f1ea033063bb11543973439b9c57ed32ac9b78f
     container_name: fireflyiv-artalk
     restart: unless-stopped
     ports:
       - "127.0.0.1:1234:23366"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
     environment:
       - TZ=Asia/Shanghai
     volumes:
       - fireflyiv-artalk:/data
-    # 首次启动自动生成配置，按需修改后重启
 
 volumes:
   fireflyiv-data:

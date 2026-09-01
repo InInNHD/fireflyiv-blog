@@ -1,11 +1,18 @@
 # shlink 短链（go.fireflyiv.com → 127.0.0.1:8704）+ 管理前端（shlink.fireflyiv.com → 127.0.0.1:8705）
+# API Key 等密钥在 shlink/.env（已 gitignore），不进仓库
+# 镜像按 sha256 摘要固定（2026-09-01 快照，与服务器现网一致）；升级时替换摘要，见 deploy/README.md「月度升级」
 services:
   shlink:
-    image: shlinkio/shlink:stable
+    image: shlinkio/shlink@sha256:77b8eb87bcb1a56bd0ecc590398d415545e5ba83414f28d37dc565a91c3c50b2
     container_name: shlink
     restart: unless-stopped
     ports:
       - "127.0.0.1:8704:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
     environment:
       DEFAULT_DOMAIN: go.fireflyiv.com
       DB_DRIVER: sqlite
@@ -18,11 +25,16 @@ services:
     volumes:
       - shlink-data:/data
   shlink-web-client:
-    image: shlinkio/shlink-web-client:latest
+    image: shlinkio/shlink-web-client@sha256:dc8bf3565a25bd0602ff11ee352920830ce457ab58a2b2c62f2ebb23e8c8b9ee
     container_name: shlink-web
     restart: unless-stopped
     ports:
       - "127.0.0.1:8705:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
     environment:
       - SHLINK_SERVER_URL=https://go.fireflyiv.com
     volumes:

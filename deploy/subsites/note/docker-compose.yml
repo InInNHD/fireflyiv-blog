@@ -1,11 +1,18 @@
 # 笔记（note.fireflyiv.com → 127.0.0.1:8712）
+# 国内直连 ghcr 不稳定，走南大镜像站（与服务器现网一致）
+# 镜像按 sha256 摘要固定（2026-09-01 快照，与服务器现网一致）；升级时替换摘要，见 deploy/README.md「月度升级」
 services:
   memos:
-    image: ghcr.nju.edu.cn/usememos/memos:latest
+    image: ghcr.nju.edu.cn/usememos/memos@sha256:4723d86e6797fd629f1f2ff7afd4e37e669df7318f00de31c7ff9acf1fe9db7f
     container_name: memos
     restart: unless-stopped
     ports:
       - "127.0.0.1:8712:5230"
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 768M
     volumes:
       - memos-data:/var/opt/memos
 volumes:

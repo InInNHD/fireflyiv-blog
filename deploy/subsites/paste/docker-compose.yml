@@ -1,11 +1,17 @@
 # 粘贴板（paste.fireflyiv.com → 127.0.0.1:8711）
+# 镜像按 sha256 摘要固定（2026-09-01 快照，与服务器现网一致）；升级时替换摘要，见 deploy/README.md「月度升级」
 services:
   privatebin:
-    image: privatebin/nginx-fpm-alpine:latest
+    image: privatebin/nginx-fpm-alpine@sha256:5ebd8e5a3de384de72449ac51d20786db42dff4c0fdb258e6a1902e6d7d4e667
     container_name: privatebin
     restart: unless-stopped
     ports:
       - "127.0.0.1:8711:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
     read_only: true
     volumes:
       - paste-data:/srv/data

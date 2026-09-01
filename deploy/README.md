@@ -3,7 +3,7 @@
 ## 拓扑
 
 ```text
-访客 → www.fireflyiv.com → Cloudflare 边缘 → 隧道(cloudflared) → 服务器 127.0.0.1:8080 (web)
+访客 → www.fireflyiv.com → Cloudflare 边缘 → 隧道(cloudflared) → 服务器 127.0.0.1:8082 (web)
                                                                   └→ 127.0.0.1:1234 (artalk)
 ```
 
@@ -48,7 +48,7 @@
 
 ## 本机运行
 
-注意：本项目为 `output: "standalone"`，**不支持 `next start`**（Next 15.5+ 会直接报错）。本地运行方式：
+注意：本项目为 `output: "standalone"`；`npm start` 已改为 `node .next/standalone/server.js`。本地运行方式：
 
 ```bash
 # 开发
@@ -56,14 +56,31 @@ npm run dev
 
 # 生产（构建后）
 npm run build
-cd .next/standalone && PORT=3000 HOSTNAME=127.0.0.1 node server.js
+npm start   # = node .next/standalone/server.js（本地 127.0.0.1:3000）
 ```
 
-## 内容更新
+## 内容更新与自动发布
 
-- 文章：本地编辑 content/posts/*.md → 提交 → docker compose up -d --build；
-- 碎碎念：站点内直接发布（M3 接入后）；
+- 文章/代码：本地编辑 → git push → 服务器 crontab 每小时运行 `ops/deploy-web.sh`：
+  fetch 检测变更 → `git pull --ff-only` → **仅重建 web 镜像** → 替换容器 → 健康检查（127.0.0.1:8082 HTTP 200）；
+  健康检查失败自动回滚上一版镜像，全程记录在 /opt/backups/deploy.log。
+- 手动全量部署：`cd deploy && bash deploy.sh`（构建全部服务 + 健康检查，不做回滚）。
+- 碎碎念：站点内直接发布；
 - 评论管理：Artalk 后台（127.0.0.1:1234 或独立子域）。
+
+## 月度升级
+
+第三方镜像按 sha256 摘要固定；升级 = 拉新版本 → 查新摘要 → 替换 compose：
+
+```bash
+docker pull 镜像名:新版本    # 先拉到本地
+docker images --digests      # 查新摘要
+# 替换对应 docker-compose.yml 的 sha256 → docker compose up -d
+```
+
+web 依赖升级：本地 `npm update` → `npm run typecheck && npm run build` → 提交推送，CI 通过后服务器自动发布。
+> 安全审计注意：国内 npm 镜像（npmmirror 等）不支持 audit 接口，请用
+> `npm audit --registry=https://registry.npmjs.org`；CI（GitHub Actions）默认走官方源，无此问题。
 
 ## 备份
 

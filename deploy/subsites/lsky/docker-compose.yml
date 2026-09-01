@@ -1,11 +1,18 @@
 # 兰空图床（i.fireflyiv.com → 127.0.0.1:8703）
+# 注：国内拉取官方镜像受限，使用社区构建 dko0/lsky-pro（与服务器现网一致）
+# 镜像按 sha256 摘要固定（2026-09-01 快照，与服务器现网一致）；升级时替换摘要，见 deploy/README.md「月度升级」
 services:
   lsky:
-    image: lskyorg/lsky-pro:latest
+    image: dko0/lsky-pro@sha256:df4a3d2734b95ec2d783b3d6224bfae6d55823333e07be91cc03abacc42b8af7
     container_name: lsky
     restart: unless-stopped
     ports:
       - "127.0.0.1:8703:80"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
     volumes:
       - lsky-data:/var/www/html/storage
 volumes:

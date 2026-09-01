@@ -1,11 +1,17 @@
 # 导航站（nav.fireflyiv.com → 127.0.0.1:8710）
+# 镜像按 sha256 摘要固定（2026-09-01 快照，与服务器现网一致）；升级时替换摘要，见 deploy/README.md「月度升级」
 services:
   dashy:
-    image: lissy93/dashy:latest
+    image: lissy93/dashy@sha256:ee0e9ee71e05bca73919222addcfb2a8b1b6b9744b03e9aabdf506e89a0b7204
     container_name: dashy
     restart: unless-stopped
     ports:
       - "127.0.0.1:8710:8080"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256M
     volumes:
       - ./conf.yml:/app/public/conf.yml
       - dashy-icons:/app/public/item-icons

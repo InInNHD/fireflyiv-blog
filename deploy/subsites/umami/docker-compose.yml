@@ -1,11 +1,17 @@
 # umami 访问统计（stats.fireflyiv.com → 127.0.0.1:8700）
+# 镜像按 sha256 摘要固定（2026-09-01 快照，与服务器现网一致）；升级时替换摘要，见 deploy/README.md「月度升级」
 services:
   umami:
-    image: ghcr.io/umami-software/umami:postgresql-latest
+    image: ghcr.io/umami-software/umami@sha256:fa32d116cf20cad52cbc3fad9a63b46e7fa02299d8f967168eb453d49c476b4a
     container_name: umami
     restart: unless-stopped
     ports:
       - "127.0.0.1:8700:3000"
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 512M
     environment:
       DATABASE_URL: postgresql://umami:${UMAMI_PG_PASSWORD:-change-me}@postgres:5432/umami
       DATABASE_TYPE: postgresql
@@ -13,11 +19,16 @@ services:
     depends_on:
       - postgres
   postgres:
-    image: postgres:16-alpine
+    image: postgres:16-alpine@sha256:cf78e76683b9ca8c5733cbbdce6c9262b45b6767934dd0a95e671f9a0fc20685
     ports:
       - "172.17.0.1:8731:5432"
     container_name: umami-pg
     restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 512M
     environment:
       POSTGRES_DB: umami
       POSTGRES_USER: umami

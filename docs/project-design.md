@@ -187,7 +187,7 @@ CREATE TABLE chatter (
 腾讯云服务器（无需向公网开放 80/443）
    ┌──────────────────────────────────────┐
    │  Caddy :80/:443（可选，tunnel 已终结 TLS 则只监听 127.0.0.1） │
-   │    ├─ 127.0.0.1:3000 → Next.js(web)  │
+   │    ├─ 127.0.0.1:8082 → Next.js(web)（容器内 3000）  │
    │    └─ 127.0.0.1:1234 → Artalk 评论    │
    │  Docker Compose：web + artalk + data  │
    └──────────────────────────────────────┘
@@ -197,8 +197,8 @@ CREATE TABLE chatter (
 1. **不外开端口**：所有服务只绑 127.0.0.1，公网入口完全交给 tunnel，安全面最小；
 2. **TLS**：隧道端（如 Cloudflare Tunnel）负责证书则 Caddy 可省；否则 Caddy 自动签发；
 3. **数据持久化**：SQLite 文件挂 Docker volume，定期 sqlite3 .backup + 同步到 Git/对象存储；
-4. **内容发布**：本地写 Markdown → git push → 服务器 webhook 或 GitHub Actions SSH 拉取并 next build 重启；
-   简化期可手动 npm run build && docker compose restart web；
+4. **内容发布**：本地写 Markdown → git push → 服务器 crontab 每小时运行 `ops/deploy-web.sh`（拉取→仅重建 web→健康检查→失败回滚）；
+   手动全量部署可 `cd deploy && bash deploy.sh`；
 5. **备案提示**：国内服务器 + 域名需 ICP 备案；tunnel 方案可规避直接暴露 80/443，合规性自行评估。
 
 ---
