@@ -18,7 +18,10 @@ sudo -n python3 /home/ubuntu/fireflyiv-blog/ops/db-backup.py "$DB" >>$LOG 2>&1 &
 VOLS="deploy_fireflyiv-data deploy_fireflyiv-artalk umami_umami-data lsky_lsky-data shlink_shlink-data hitokoto_hitokoto-data hitokoto_hitokoto-redis-data uptime-kuma-data nav_dashy-icons note_memos-data paste_paste-data vault_vaultwarden-data"
 for v in $VOLS; do
   if docker volume inspect "$v" >/dev/null 2>&1; then
-    docker run --rm -v "$v":/data:ro -v "$OUT":/out alpine:3.20 sh -c "tar czf /out/$v.tar.gz -C /data ." >>$LOG 2>&1 && echo "OK  $v" >> $LOG || echo "FAIL $v" >> $LOG
+    if [ "$v" = "hitokoto_hitokoto-redis-data" ]; then
+      docker exec hitokoto-redis redis-cli SAVE >/dev/null 2>>$LOG || true
+    fi
+    docker run --rm -v "$v":/data:ro -v "$OUT":/out alpine:3.20 sh -c "tar --exclude='temp-*.rdb' -czf /out/$v.tar.gz -C /data ." >>$LOG 2>&1 && echo "OK  $v" >> $LOG || echo "FAIL $v" >> $LOG
   fi
 done
 
@@ -34,6 +37,7 @@ tar czf "$OUT/fireflyiv-blog.tar.gz" -C "$HOME/fireflyiv-blog" . >>$LOG 2>&1 && 
 tar czf "$OUT/nginx-conf.tar.gz" -C /etc/nginx/conf.d . >>$LOG 2>&1
 tar czf "$OUT/systemd-units.tar.gz" /etc/systemd/system/beszel.service /lib/systemd/system/beszel-agent.service >>$LOG 2>&1
 sudo -n tar czf "$OUT/cloudflared-token.tar.gz" -C /etc/cloudflared token >>$LOG 2>&1 && echo "OK  cloudflared token" >> $LOG || echo "WARN cloudflared token 未备份" >> $LOG
+crontab -l > "$OUT/crontab.txt" 2>>$LOG || true
 
 # 6) 同步到 Cloudflare R2（crypt 加密层）
 if command -v rclone >/dev/null 2>&1; then

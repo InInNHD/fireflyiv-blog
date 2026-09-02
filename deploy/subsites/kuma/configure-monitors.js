@@ -68,6 +68,10 @@ async function main() {
         "INSERT INTO monitor_group (monitor_id, group_id, weight, send_url) VALUES (?, ?, ?, 0)",
         [ids[weight], group.id, 1000 + weight],
       );
+      await run(
+        "INSERT INTO monitor_notification (monitor_id, notification_id) SELECT ?, n.id FROM notification n WHERE n.active = 1 AND NOT EXISTS (SELECT 1 FROM monitor_notification mn WHERE mn.monitor_id = ? AND mn.notification_id = n.id)",
+        [ids[weight], ids[weight]],
+      );
     }
     await run("COMMIT");
     console.log(JSON.stringify({ backup, monitors: monitors.length }));

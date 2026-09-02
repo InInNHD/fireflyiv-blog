@@ -101,7 +101,8 @@
 - 可用性：Uptime Kuma 14 项功能探针；页面检查稳定特征，一言 API 校验 JSON 对象，导航检查实际配置文件
 - 服务器：Beszel（CPU/内存/磁盘/网络/11 容器指标，agent 令牌可扩展多机）
 - 访问统计：Umami（主站埋点，文章 PV 直查展示）
-- ⚠️ 告警通知渠道未配（邮件/Webhook 待办）
+- 告警：Uptime Kuma 14 个内容探针与 Beszel 资源阈值均发送到 QQ 邮箱；磁盘使用率达到 80% 时告警
+- 磁盘维护：Docker 构建缓存每周限制在 3GB；2026-09-02 首次清理释放 6.26GB，系统盘使用率由 72% 降至 56%
 
 ### 安全
 - 服务器仅开 22（安全组）；全部服务绑 127.0.0.1 或 docker 内网
@@ -111,10 +112,7 @@
 
 ## 五、待办 / 后续方向
 
-1. 告警通知（uptime-kuma + Beszel 邮件/Webhook）
-2. 备份异地化（COS/rclone）
-3. 补充真实追番条目、个人图集与首页游戏/音乐状态
-4. 全量离线 Service Worker（PWA 完整化）
-5. Memos 完成初始化 + 录入 Vaultwarden
-6. 新子站候选：files.filebrowser / docker.Dockge / git.Gitea
-7. 主站内容：持续写作，并逐步整理系列文章
+1. 补充真实追番条目、个人图集与首页游戏/音乐状态
+2. Memos 完成初始化 + 录入 Vaultwarden
+3. 主站内容：持续写作，并逐步整理系列文章
+4. 全量离线 Service Worker（内容稳定后再评估）
