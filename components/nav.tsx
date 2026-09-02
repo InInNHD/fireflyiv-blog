@@ -9,6 +9,7 @@ import ThemeToggle from "./theme-toggle";
 const LINKS = [
   { href: "/", label: "首页" },
   { href: "/posts", label: "文章" },
+  { href: "/projects", label: "项目" },
   { href: "/categories", label: "分类" },
   { href: "/tags", label: "标签" },
   { href: "/series", label: "系列" },
@@ -21,12 +22,15 @@ const LINKS = [
   { href: "/about", label: "关于" },
 ];
 
-export default function Nav() {
+const OPTIONAL_SECTIONS = new Set(["/anime", "/music", "/gallery", "/links"]);
+
+export default function Nav({ enabledSections = [] }: { enabledSections?: string[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const drawerRef = useRef<HTMLElement>(null);
   const active = (href: string) => href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
+  const links = LINKS.filter((link) => !OPTIONAL_SECTIONS.has(link.href) || enabledSections.includes(link.href));
 
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
@@ -74,13 +78,13 @@ export default function Nav() {
         </Link>
 
         <nav aria-label="主导航" className="hidden items-center gap-1 text-sm whitespace-nowrap xl:flex">
-          {LINKS.map((link) => navLink(link))}
+          {links.map((link) => navLink(link))}
           <SearchDialog />
           <ThemeToggle />
         </nav>
 
         <nav aria-label="移动端主导航" className="flex items-center gap-0.5 text-sm whitespace-nowrap xl:hidden">
-          {LINKS.slice(0, 2).map((link) => navLink(link, true))}
+          {links.slice(0, 2).map((link) => navLink(link, true))}
           <SearchDialog />
           <ThemeToggle />
           <button
@@ -115,7 +119,7 @@ export default function Nav() {
               <button type="button" className="chip cursor-pointer" onClick={() => setOpen(false)} aria-label="关闭全部导航">×</button>
             </div>
             <div className="grid grid-cols-2 gap-2 text-sm">
-              {LINKS.slice(2).map((link) => (
+              {links.slice(2).map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}

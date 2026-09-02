@@ -7,7 +7,8 @@
 - 文章系统：Markdown 写在 content/posts/，SSG 静态生成，支持草稿、置顶、分类、系列、独立评论开关
 - 文章页：封面系统（自定义图/自动渐变）、shiki 双主题高亮与代码复制、GitHub 风格提示块、TOC、阅读时长、相关文章、过期提示、上一篇/下一篇、阅读进度条
 - 浏览量实显：文章页展示真实 PV（直查 Umami Postgres，5 分钟缓存）
-- 碎碎念 /chatter：SQLite 存储 + Bearer Token 发布 + 心情 emoji + 图片 + 标签 + 独立链接 + 游标分页
+- 碎碎念 /chatter：公开只读时间线；/admin/chatter 使用 Bearer Token 发布，并应由 Cloudflare Access 保护
+- 项目与服务 /projects：展示主站和公开自托管服务矩阵
 - 标签 /tags + 分类 /categories + 系列 /series + 归档 /archive（时间线）
 - 追番 /anime：观看状态、进度、评分、短评与外链；无条目时显示空状态
 - 音乐 /music：原生音频播放器、歌单切换、LRC 同步滚动与点击跳转歌词
@@ -36,7 +37,7 @@
 - PWA manifest（可安装基础版；全量离线 SW 未做）
 
 ### 站点辅助
-- 首页：玻璃拟态英雄区 + 自建一言（api.fireflyiv.com，10 分钟缓存）+ 最近状态 + 最新 6 篇
+- 首页：60 秒 ISR 的紧凑玻璃 Bento + 自建一言 + 14 项服务状态 + 最新文章；没有真实数据的模块不展示
 - 页脚：分站导航（统计/图床/短链/一言/RSS）
 - 404 定制页
 

@@ -7,7 +7,7 @@ import ClickEffect from "@/components/click-effect";
 import MouseTrail from "@/components/mouse-trail";
 import ImageLightbox from "@/components/lightbox";
 import BackToTop from "@/components/back-to-top";
-import { getSiteInfo } from "@/lib/site";
+import { getAnimeData, getFriendLinks, getGallery, getMusicData, getSiteInfo } from "@/lib/site";
 
 const SITE_URL = process.env.SITE_URL ?? "https://www.fireflyiv.com";
 
@@ -34,6 +34,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const enabledSections = [
+    getAnimeData().items.length ? "/anime" : null,
+    getMusicData().tracks.length ? "/music" : null,
+    getGallery().length ? "/gallery" : null,
+    getFriendLinks().length ? "/links" : null,
+  ].filter((pathname): pathname is string => Boolean(pathname));
+
   return (
     <html lang="zh-CN" suppressHydrationWarning>
       <head>
@@ -66,7 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ImageLightbox />
         <BackToTop />
         <Fireflies />
-        <Nav />
+        <Nav enabledSections={enabledSections} />
         <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16">{children}</main>
         <footer className="border-t border-line px-4 py-8 text-center text-sm text-muted">
           <nav aria-label="分站导航" className="mb-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">

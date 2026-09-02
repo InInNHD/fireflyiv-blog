@@ -21,7 +21,7 @@ function timeAgo(ts: number): string {
 
 const TOKEN_KEY = "firefly-chatter-token";
 
-export default function ChatterApp() {
+export default function ChatterApp({ admin = false }: { admin?: boolean }) {
   const [items, setItems] = useState<ChatterItem[]>([]);
   const [nextBefore, setNextBefore] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -35,14 +35,16 @@ export default function ChatterApp() {
   const [showTokenBox, setShowTokenBox] = useState(false);
   const tokenInput = useRef<HTMLInputElement>(null);
 
-  // 初始加载 + 恢复本地 token
+  // 初始加载；仅管理页恢复本地 token
   useEffect(() => {
-    try {
-      const t = localStorage.getItem(TOKEN_KEY);
-      if (t) setToken(t);
-    } catch { /* ignore */ }
+    if (admin) {
+      try {
+        const t = localStorage.getItem(TOKEN_KEY);
+        if (t) setToken(t);
+      } catch { /* ignore */ }
+    }
     fetchItems();
-  }, []);
+  }, [admin]);
 
   const fetchItems = useCallback(async (before?: number) => {
     setLoading(true);
@@ -109,8 +111,7 @@ export default function ChatterApp() {
 
   return (
     <div className="space-y-4">
-      {/* 发布框（管理员） */}
-      <div className="card p-4">
+      {admin && <div className="card p-4">
         <textarea
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
@@ -166,7 +167,7 @@ export default function ChatterApp() {
             <button className="chip" onClick={saveToken}>保存</button>
           </div>
         )}
-      </div>
+      </div>}
 
       {error && (
         <p className="rounded-xl border border-red-400/30 bg-red-400/10 px-4 py-2 text-xs text-red-400">

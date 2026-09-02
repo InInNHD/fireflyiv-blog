@@ -3,7 +3,8 @@
 萤火虽微，愿为其芒 —— 自托管的个人博客（Next.js 16 + React 19 + Tailwind CSS v4 + SQLite）。
 
 - 文章：Markdown 写在 `content/posts/`，支持分类、系列、置顶、阅读时长、相关文章、过期提示与独立评论开关
-- 碎碎念：`/chatter`，SQLite（Node 内置 `node:sqlite`）存储，支持图片、标签、独立链接与 Bearer Token 鉴权发布
+- 碎碎念：`/chatter` 公开只读，`/admin/chatter` 发布；SQLite（Node 内置 `node:sqlite`）存储，支持图片、标签、独立链接与 Bearer Token 鉴权
+- 项目与服务：`/projects`，集中展示主站与公开自托管服务
 - 二次元内容：`/anime` 追番状态、`/music` 原生音频与同步歌词、`/gallery` 图集灯箱、首页「最近状态」
 - 评论：Artalk 自托管（可选，未配置时自动隐藏）
 - 阅读体验：Shiki 代码高亮与复制、GitHub 风格提示块、RSS、目录、上一篇/下一篇、站内搜索（`/` 快捷键）、阅读进度条、图片灯箱
@@ -50,7 +51,7 @@ npm start   # = node .next/standalone/server.js（本地 127.0.0.1:3000）
 | 变量 | 作用 | 必填 |
 |---|---|---|
 | `SITE_URL` | RSS/sitemap/OG 的绝对地址 | 上线前必填 |
-| `CHATTER_TOKEN` | 碎碎念发布 token（页面「🔑 管理员」输入） | 想发碎碎念时必填 |
+| `CHATTER_TOKEN` | 碎碎念发布 token（在 `/admin/chatter` 输入） | 想发碎碎念时必填 |
 | `NEXT_PUBLIC_ARTALK_SERVER` | Artalk 评论服务地址 | 未部署 Artalk 可留空 |
 | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Cloudflare Turnstile 站点密钥 | 开启友链反滥用时必填 |
 | `TURNSTILE_SECRET_KEY` | Cloudflare Turnstile 服务端密钥 | 开启友链反滥用时必填 |
@@ -82,7 +83,7 @@ comment: true                       # 是否显示 Artalk 评论
 
 1. 设置环境变量 `CHATTER_TOKEN`（任意长随机字符串，如 `openssl rand -hex 24`）；
 2. 重启 dev server；
-3. 打开 `/chatter` -> 点「🔑 管理员」输入同一个 token -> 即可发布文字、心情、图片与标签（token 保存在浏览器 localStorage）；每条内容可通过时间链接进入独立页面。
+3. 打开 `/admin/chatter`，输入同一个 token，即可发布文字、心情、图片与标签（token 保存在浏览器 localStorage）；公开的 `/chatter` 页面只展示内容。
 
 ## 更新追番、音乐、图集与最近状态
 

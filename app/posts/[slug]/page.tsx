@@ -8,6 +8,7 @@ import ReadingProgress from "@/components/reading-progress";
 import PostViews from "@/components/post-views";
 import CodeCopyButtons from "@/components/code-copy-buttons";
 import PostCard from "@/components/post-card";
+import PostShare from "@/components/post-share";
 import { renderMarkdown } from "@/lib/markdown";
 import { getAllPosts, getPostBySlug, getRelatedPosts } from "@/lib/blog";
 import type { PostMeta } from "@/lib/blog";
@@ -160,9 +161,12 @@ export default async function PostPage({ params }: Props) {
         <div className="markdown-body" dangerouslySetInnerHTML={{ __html: html }} />
         <CodeCopyButtons />
 
-        <footer className="flex items-center justify-between border-t border-line pt-6 text-sm">
+        <footer className="flex flex-wrap items-center justify-between gap-2 border-t border-line pt-6 text-sm">
           <Link href="/posts" className="chip">← 返回文章列表</Link>
-          <Link href="/" className="chip">回到首页</Link>
+          <div className="flex items-center gap-2">
+            <PostShare title={post.title} />
+            <Link href="/" className="chip">回到首页</Link>
+          </div>
         </footer>
 
         {/* 上一篇 / 下一篇 */}

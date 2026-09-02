@@ -38,6 +38,7 @@ const nextConfig: NextConfig = {
     const publicAssetCache = [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }];
     return [
       { source: "/:path*", headers: securityHeaders },
+      { source: "/admin/:path*", headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }] },
       { source: "/covers/:path*", headers: publicAssetCache },
       { source: "/gallery/:path*", headers: publicAssetCache },
       { source: "/music/:path*", headers: publicAssetCache },

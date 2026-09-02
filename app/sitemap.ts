@@ -1,10 +1,13 @@
 import type { MetadataRoute } from "next";
 import { getAllCategories, getAllPosts, getAllSeries, getAllTags } from "@/lib/blog";
+import { getAnimeData, getFriendLinks, getGallery, getMusicData } from "@/lib/site";
 
 const SITE_URL = process.env.SITE_URL ?? "https://www.fireflyiv.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const posts = getAllPosts().map((p) => ({
+  const allPosts = getAllPosts();
+  const latestPostDate = allPosts[0] ? new Date(allPosts[0].updated ?? allPosts[0].date) : undefined;
+  const posts = allPosts.map((p) => ({
     url: `${SITE_URL}/posts/${p.slug}`,
     lastModified: new Date(p.updated ?? p.date),
   }));
@@ -12,21 +15,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...getAllTags().map((item) => `/tags/${item.slug}`),
     ...getAllCategories().map((item) => `/categories/${item.slug}`),
     ...getAllSeries().map((item) => `/series/${item.slug}`),
-  ].map((pathname) => ({ url: `${SITE_URL}${pathname}`, lastModified: new Date() }));
+  ].map((pathname) => ({ url: `${SITE_URL}${pathname}`, lastModified: latestPostDate }));
+
+  const optionalRoutes = [
+    getAnimeData().items.length ? "/anime" : null,
+    getMusicData().tracks.length ? "/music" : null,
+    getGallery().length ? "/gallery" : null,
+    getFriendLinks().length ? "/links" : null,
+  ].filter((pathname): pathname is string => Boolean(pathname));
 
   return [
-    { url: SITE_URL, lastModified: new Date() },
-    { url: `${SITE_URL}/posts`, lastModified: new Date() },
-    { url: `${SITE_URL}/tags`, lastModified: new Date() },
-    { url: `${SITE_URL}/categories`, lastModified: new Date() },
-    { url: `${SITE_URL}/series`, lastModified: new Date() },
-    { url: `${SITE_URL}/archive`, lastModified: new Date() },
-    { url: `${SITE_URL}/chatter`, lastModified: new Date() },
-    { url: `${SITE_URL}/anime`, lastModified: new Date() },
-    { url: `${SITE_URL}/music`, lastModified: new Date() },
-    { url: `${SITE_URL}/gallery`, lastModified: new Date() },
-    { url: `${SITE_URL}/links`, lastModified: new Date() },
-    { url: `${SITE_URL}/about`, lastModified: new Date() },
+    ...["", "/posts", "/tags", "/categories", "/series", "/archive", "/projects"].map((pathname) => ({
+      url: `${SITE_URL}${pathname}`,
+      lastModified: latestPostDate,
+    })),
+    { url: `${SITE_URL}/chatter` },
+    { url: `${SITE_URL}/about` },
+    ...optionalRoutes.map((pathname) => ({ url: `${SITE_URL}${pathname}` })),
     ...posts,
     ...collections,
   ];

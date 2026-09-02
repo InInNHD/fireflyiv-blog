@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import Hitokoto from "@/components/hitokoto";
 import HomeSearchTrigger from "@/components/home-search-trigger";
 import PostCard from "@/components/post-card";
@@ -6,7 +7,17 @@ import { getListedPosts } from "@/lib/blog";
 import { countChatter, listChatter } from "@/lib/db";
 import { getAnimeData, getGallery, getMusicData, getSiteInfo } from "@/lib/site";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
+interface StatusMonitor {
+  id: number;
+  name: string;
+}
+
+interface StatusHeartbeat {
+  status: number;
+  time?: string;
+}
 
 async function getServiceStatus() {
   try {
@@ -23,14 +34,18 @@ async function getServiceStatus() {
     if (!configResponse.ok || !heartbeatResponse.ok) throw new Error("status api failed");
     const config = await configResponse.json();
     const heartbeat = await heartbeatResponse.json();
-    const total = config.publicGroupList?.[0]?.monitorList?.length ?? 0;
-    const latest = Object.values(heartbeat.heartbeatList ?? {}).map((items) =>
-      Array.isArray(items) ? items.at(-1) : null,
+    const monitors = (config.publicGroupList ?? []).flatMap(
+      (group: { monitorList?: StatusMonitor[] }) => group.monitorList ?? [],
     );
-    const up = latest.filter(
-      (item) => item && typeof item === "object" && "status" in item && item.status === 1,
-    ).length;
-    return { up, total };
+    const heartbeatList = (heartbeat.heartbeatList ?? {}) as Record<string, StatusHeartbeat[]>;
+    const latest = monitors.map((monitor: StatusMonitor) => ({
+      monitor,
+      heartbeat: heartbeatList[String(monitor.id)]?.at(-1),
+    }));
+    const up = latest.filter((item: { heartbeat?: StatusHeartbeat }) => item.heartbeat?.status === 1).length;
+    const down = latest.filter((item: { heartbeat?: StatusHeartbeat }) => item.heartbeat?.status !== 1).map((item: { monitor: StatusMonitor }) => item.monitor.name);
+    const checkedAt = latest.map((item: { heartbeat?: StatusHeartbeat }) => item.heartbeat?.time).filter(Boolean).sort().at(-1);
+    return { up, total: monitors.length, down, checkedAt };
   } catch {
     return null;
   }
@@ -58,11 +73,14 @@ export default async function HomePage() {
       <section className={currentTrack ? "grid gap-4 lg:grid-cols-[1.35fr_0.85fr]" : ""} aria-label="个人简介与当前音乐">
         <article className="glass-panel glass-feature overflow-hidden p-5 sm:p-6">
           <div className="flex items-center gap-4 sm:gap-5">
-            <img
+            <Image
               src={site.avatar}
               alt={`${site.nick} 的头像`}
+              width={96}
+              height={96}
+              priority
+              sizes="(min-width: 640px) 96px, 80px"
               className="size-20 shrink-0 rounded-2xl border border-line object-cover shadow-[0_0_30px_color-mix(in_srgb,var(--accent)_22%,transparent)] sm:size-24"
-              referrerPolicy="no-referrer"
             />
             <div className="min-w-0 flex-1">
               <p className="text-xs uppercase tracking-[0.24em] text-accent">Hello, I am</p>
@@ -114,8 +132,16 @@ export default async function HomePage() {
         <a href="https://status.fireflyiv.com" target="_blank" rel="noreferrer" className="glass-panel glass-panel-hover min-h-32 p-5 sm:col-span-2 lg:col-span-1">
           <p className="text-xs text-accent">服务状态</p>
           <p className="mt-3 text-2xl font-semibold">{serviceStatus ? `${serviceStatus.up}/${serviceStatus.total}` : "查看状态"}</p>
-          <p className="mt-1 text-xs text-muted">{serviceStatus && serviceStatus.up === serviceStatus.total ? "全部服务正常" : "打开实时状态页 →"}</p>
+          <p className="mt-1 text-xs text-muted">
+            {serviceStatus?.down.length ? `${serviceStatus.down.slice(0, 2).join("、")} 异常` : serviceStatus ? "全部服务正常" : "打开实时状态页 →"}
+          </p>
+          {serviceStatus?.checkedAt && <p className="mt-2 text-[11px] text-muted">最近探测 {serviceStatus.checkedAt.slice(5, 16)}</p>}
         </a>
+        <Link href="/projects" className="glass-panel glass-panel-hover min-h-32 p-5 sm:col-span-2 lg:col-span-1">
+          <p className="text-xs text-accent">项目与服务</p>
+          <p className="mt-3 text-lg font-semibold">自托管服务矩阵</p>
+          <p className="mt-1 text-xs text-muted">查看主站与公开子站 →</p>
+        </Link>
         {hasNow && <div className="glass-panel min-h-32 p-5 sm:col-span-2 lg:col-span-3">
           <p className="text-xs text-accent">最近状态</p>
           <div className="mt-3 grid gap-2 text-sm sm:grid-cols-3">

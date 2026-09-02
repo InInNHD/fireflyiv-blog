@@ -23,6 +23,7 @@ HSTS 必须由 apex 的 HTTPS 响应下发；只在 `www` 源站添加 `includeS
 | Beszel | `monitor.fireflyiv.com/*` | 整站保护 |
 | Artalk 后台 | `talk.fireflyiv.com/sidebar*` | 评论前台与公开 API 不受影响 |
 | Uptime Kuma 后台 | `uptime-kuma.fireflyiv.com/dashboard*` | 公开状态页使用独立 `status` 子域 |
+| 碎碎念管理 | `www.fireflyiv.com/admin/chatter*` | 公开 `/chatter` 与读取 API 不受影响 |
 | Umami 后台 | `stats.fireflyiv.com/*` | 默认保护；为下面两个更具体路径创建 Bypass |
 | Umami 脚本 | `stats.fireflyiv.com/script.js` | Bypass，供主站加载 |
 | Umami 采集 | `stats.fireflyiv.com/api/send` | Bypass，供公开埋点写入 |
