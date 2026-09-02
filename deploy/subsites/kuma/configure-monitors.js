@@ -6,7 +6,7 @@ const db = new sqlite3.Database(dbPath);
 const monitors = [
   ["主站 www", "keyword", "https://www.fireflyiv.com", "FireflyIv", null, null],
   ["评论 talk", "keyword", "http://127.0.0.1:1234", "Artalk", null, null],
-  ["统计 stats", "keyword", "https://stats.fireflyiv.com", "Umami", null, null],
+  ["统计 stats", "keyword", "http://127.0.0.1:8700", "Umami", null, null],
   ["一言 api", "json-query", "https://api.fireflyiv.com", null, "$type($)", "object"],
   ["图床 i", "keyword", "https://i.fireflyiv.com", "Lsky Pro", null, null],
   ["短链 go", "keyword", "https://go.fireflyiv.com", "FireflyIv", null, null],
