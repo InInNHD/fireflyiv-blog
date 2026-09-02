@@ -35,11 +35,11 @@ export default function ChatterApp({ admin = false }: { admin?: boolean }) {
   const [showTokenBox, setShowTokenBox] = useState(false);
   const tokenInput = useRef<HTMLInputElement>(null);
 
-  // 初始加载；仅管理页恢复本地 token
+  // 初始加载；token 只在当前浏览器会话中保留。
   useEffect(() => {
     if (admin) {
       try {
-        const t = localStorage.getItem(TOKEN_KEY);
+        const t = sessionStorage.getItem(TOKEN_KEY);
         if (t) setToken(t);
       } catch { /* ignore */ }
     }
@@ -67,14 +67,14 @@ export default function ChatterApp({ admin = false }: { admin?: boolean }) {
     const v = tokenInput.current?.value.trim() ?? "";
     setToken(v);
     try {
-      if (v) localStorage.setItem(TOKEN_KEY, v);
+      if (v) sessionStorage.setItem(TOKEN_KEY, v);
     } catch { /* ignore */ }
     setShowTokenBox(false);
   };
 
   const clearToken = () => {
     setToken("");
-    try { localStorage.removeItem(TOKEN_KEY); } catch { /* ignore */ }
+    try { sessionStorage.removeItem(TOKEN_KEY); } catch { /* ignore */ }
   };
 
   const submit = async () => {
@@ -82,7 +82,7 @@ export default function ChatterApp({ admin = false }: { admin?: boolean }) {
     if (!content || posting) return;
     setPosting(true);
     try {
-      const res = await fetch("/api/chatter", {
+      const res = await fetch("/api/admin/chatter", {
         method: "POST",
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         body: JSON.stringify({ content, mood, img: img.trim(), tags: tagDraft.split(/[,，]/) }),
@@ -186,7 +186,7 @@ export default function ChatterApp({ admin = false }: { admin?: boolean }) {
               {it.mood && <span className="mr-1.5">{it.mood}</span>}
               {it.content}
             </p>
-            {it.img && <img src={it.img} alt={`${it.content.slice(0, 40)} 的配图`} loading="lazy" className="mt-2 max-h-64 cursor-zoom-in rounded-xl border border-line" />}
+            {it.img && <img src={it.img} alt={`${it.content.slice(0, 40)} 的配图`} width={1200} height={800} loading="lazy" decoding="async" className="mt-2 h-auto max-h-64 max-w-full cursor-zoom-in rounded-xl border border-line" />}
             {it.tags?.length > 0 && <div className="mt-2 flex flex-wrap gap-1">{it.tags.map((tag) => <span key={tag} className="chip"># {tag}</span>)}</div>}
             <div className="mt-2 flex items-center justify-between gap-3 font-mono text-xs text-muted">
               <time>{timeAgo(it.created_at)}</time>

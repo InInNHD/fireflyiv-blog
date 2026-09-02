@@ -25,7 +25,7 @@ export default function AnimePage() {
             const content = (
               <article className="card card-hover flex h-full overflow-hidden">
                 {item.cover ? (
-                  <img src={item.cover} alt={`${item.title} 封面`} loading="lazy" className="w-28 shrink-0 object-cover sm:w-32" />
+                  <img src={item.cover} alt={`${item.title} 封面`} width={256} height={384} loading="lazy" decoding="async" className="w-28 shrink-0 object-cover sm:w-32" />
                 ) : (
                   <div className="grid w-28 shrink-0 place-items-center bg-surface2 text-3xl sm:w-32">{STATUS[item.status].icon}</div>
                 )}

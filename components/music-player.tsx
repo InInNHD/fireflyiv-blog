@@ -103,7 +103,7 @@ export default function MusicPlayer({ data }: { data: MusicData }) {
       {track.cover && <div className="music-ambient" style={{ backgroundImage: `url(${track.cover})` }} />}
       <section className="glass-panel music-control" aria-label="音乐播放器">
         <div className={`music-cover ${playing ? "is-playing" : ""}`}>
-          {track.cover ? <img src={track.cover} alt={`${track.title} 封面`} /> : <span aria-hidden>♫</span>}
+          {track.cover ? <img src={track.cover} alt={`${track.title} 封面`} width={512} height={512} decoding="async" /> : <span aria-hidden>♫</span>}
         </div>
         <p className="mt-7 text-xs uppercase tracking-[0.24em] text-accent">Now playing</p>
         <h2 className="mt-2 text-center text-2xl font-bold">{track.title}</h2>

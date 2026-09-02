@@ -15,4 +15,4 @@ npm run check:smoke
 - Umami `script.js` 必须保持 JavaScript MIME，`/api/send` 不能被 Access 拦截；
 - 短链裸域必须回到主站。
 
-部署后的恢复顺序：先运行 `npm run check:smoke` 定位入口，再看 Uptime Kuma 最近心跳；只有主站失败时检查 web 容器与 `/opt/backups/deploy.log`，只有子站失败时检查对应容器、nginx 或 Tunnel hostname。Access 相关失败优先检查应用路径与 Bypass 策略，不要通过取消整站保护临时恢复。
+部署后的恢复顺序：先运行 `npm run check:smoke` 定位入口，再看 Uptime Kuma 最近心跳；主站断言同时覆盖公开碎碎念、管理页及写入 API 的 Access、首页缓存、项目页和站点地图。只有主站失败时检查 web 容器与 `/opt/backups/deploy.log`，只有子站失败时检查对应容器、nginx 或 Tunnel hostname。Access 相关失败优先检查应用路径与 Bypass 策略，不要通过取消整站保护临时恢复。

@@ -10,7 +10,7 @@ interface TocItem {
 
 // 文章目录：从 .markdown-body 的 h1~h3（rehype-slug 已生成 id）扫描生成，
 // 滚动监听高亮当前章节；标题不足 2 个时不渲染。
-export default function PostToc() {
+export default function PostToc({ collapsible = false }: { collapsible?: boolean }) {
   const [items, setItems] = useState<TocItem[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -48,12 +48,8 @@ export default function PostToc() {
 
   if (items.length === 0) return null;
 
-  return (
-    <nav className="rounded-2xl border border-line bg-surface p-4" aria-label="文章目录">
-      <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold">
-        <span className="text-accent">📑</span> 目录
-      </p>
-      <ul className="space-y-0.5">
+  const links = (
+      <ul className={collapsible ? "mt-2 space-y-0.5" : "space-y-0.5"}>
         {items.map((h) => (
           <li key={h.id} style={{ paddingLeft: `${(h.level - 1) * 0.75}rem` }}>
             <a
@@ -75,6 +71,21 @@ export default function PostToc() {
           </li>
         ))}
       </ul>
+  );
+
+  if (collapsible) {
+    return (
+      <details className="rounded-2xl border border-line bg-surface p-4">
+        <summary className="cursor-pointer text-sm font-semibold text-accent">📑 本文目录</summary>
+        <nav aria-label="文章目录">{links}</nav>
+      </details>
+    );
+  }
+
+  return (
+    <nav className="rounded-2xl border border-line bg-surface p-4" aria-label="文章目录">
+      <p className="mb-2 flex items-center gap-1.5 text-sm font-semibold"><span className="text-accent">📑</span> 目录</p>
+      {links}
     </nav>
   );
 }

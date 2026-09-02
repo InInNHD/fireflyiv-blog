@@ -627,6 +627,7 @@ html.light .markdown-body pre {
 }
 
 .markdown-body img {
+  height: auto;
   max-width: 100%;
   border-radius: 0.8rem;
   border: 1px solid var(--line);

@@ -29,9 +29,35 @@ const access = async (url) => {
   }
   throw new Error(`${url}: 未跳转到 Cloudflare Access`);
 };
+const methodNotAllowed = async (url) => {
+  const response = await request(url, { method: "POST", headers: { "content-type": "application/json" }, body: "{}" });
+  assert.equal(response.status, 405, `${url}: POST 应返回 405，实际为 ${response.status}`);
+};
 
 const checks = [
-  ["主站", async () => content("https://www.fireflyiv.com/", "FireflyIv")],
+  ["主站", async () => {
+    const { response, body } = await getText("https://www.fireflyiv.com/");
+    assert(body.includes("FireflyIv"), "主站标题错误");
+    assert(response.headers.get("cache-control")?.includes("s-maxage=60"), "主站缓存策略缺少 s-maxage=60");
+  }],
+  ["公开碎碎念", async () => {
+    const { body } = await getText("https://www.fireflyiv.com/chatter");
+    assert(!body.includes("输入 CHATTER_TOKEN"), "公开碎碎念泄露管理表单");
+    await json("https://www.fireflyiv.com/api/chatter?limit=1");
+    await methodNotAllowed("https://www.fireflyiv.com/api/chatter");
+  }],
+  ["碎碎念管理", async () => {
+    await access("https://www.fireflyiv.com/admin/chatter");
+    await access("https://www.fireflyiv.com/api/admin/chatter");
+  }],
+  ["项目矩阵", async () => content("https://www.fireflyiv.com/projects", "项目与服务")],
+  ["站点地图", async () => {
+    const { body } = await getText("https://www.fireflyiv.com/sitemap.xml");
+    assert(body.includes("https://www.fireflyiv.com/projects"), "站点地图缺少项目页");
+    for (const route of ["anime", "music", "gallery", "links"]) {
+      assert(!body.includes(`https://www.fireflyiv.com/${route}<`), `空内容页面 /${route} 不应出现在站点地图`);
+    }
+  }],
   ["Artalk", async () => { await json("https://talk.fireflyiv.com/api/v2/conf"); await access("https://talk.fireflyiv.com/sidebar"); }],
   ["Lsky 图床", async () => content("https://i.fireflyiv.com/", "Lsky Pro")],
   ["Shlink 短链", async () => {

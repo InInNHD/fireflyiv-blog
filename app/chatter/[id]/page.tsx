@@ -33,7 +33,7 @@ export default async function ChatterDetailPage({ params }: Props) {
       <Link href="/chatter" className="chip">← 返回碎碎念</Link>
       <article data-lightbox className="card space-y-4 p-6">
         <p className="text-lg leading-relaxed">{item.mood && <span className="mr-2">{item.mood}</span>}{item.content}</p>
-        {item.img && <img src={item.img} alt={`${item.content.slice(0, 40)} 的配图`} className="max-h-[70vh] cursor-zoom-in rounded-xl border border-line" />}
+        {item.img && <img src={item.img} alt={`${item.content.slice(0, 40)} 的配图`} width={1200} height={800} decoding="async" className="h-auto max-h-[70vh] max-w-full cursor-zoom-in rounded-xl border border-line" />}
         {item.tags.length > 0 && <div className="flex flex-wrap gap-1">{item.tags.map((tag) => <span key={tag} className="chip"># {tag}</span>)}</div>}
         <time dateTime={new Date(item.created_at).toISOString()} className="block text-xs text-muted">
           {new Date(item.created_at).toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}

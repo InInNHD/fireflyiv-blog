@@ -94,6 +94,12 @@ export default async function PostPage({ params }: Props) {
   const idx = posts.findIndex((p) => p.slug === slug);
   const newer = idx > 0 ? posts[idx - 1] : null;
   const older = idx >= 0 && idx < posts.length - 1 ? posts[idx + 1] : null;
+  const seriesPosts = post.series
+    ? posts.filter((item) => item.series?.slug === post.series?.slug).reverse()
+    : [];
+  const seriesIndex = seriesPosts.findIndex((item) => item.slug === post.slug);
+  const seriesPrevious = seriesIndex > 0 ? seriesPosts[seriesIndex - 1] : null;
+  const seriesNext = seriesIndex >= 0 && seriesIndex < seriesPosts.length - 1 ? seriesPosts[seriesIndex + 1] : null;
 
   return (
     <div className="mx-auto grid max-w-3xl gap-10 pt-8 lg:max-w-4xl lg:grid-cols-[minmax(0,1fr)_13rem] lg:items-start lg:gap-x-10">
@@ -157,6 +163,21 @@ export default async function PostPage({ params }: Props) {
             ⏳ 本文距上次更新已超过一年，部分内容可能已经变化。
           </aside>
         )}
+
+        {post.series && seriesIndex >= 0 && (
+          <aside className="rounded-xl border border-line bg-surface2 px-4 py-3 text-sm" aria-label="系列阅读进度">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <Link href={`/series/${post.series.slug}`} className="font-medium text-accent">📚 {post.series.name}</Link>
+              <span className="text-muted">第 {seriesIndex + 1}/{seriesPosts.length} 篇</span>
+            </div>
+            {(seriesPrevious || seriesNext) && <div className="mt-2 flex flex-wrap justify-between gap-2 text-xs">
+              {seriesPrevious ? <Link href={`/posts/${seriesPrevious.slug}`} className="text-muted hover:text-accent">← {seriesPrevious.title}</Link> : <span />}
+              {seriesNext && <Link href={`/posts/${seriesNext.slug}`} className="text-right text-muted hover:text-accent">{seriesNext.title} →</Link>}
+            </div>}
+          </aside>
+        )}
+
+        <div className="lg:hidden"><PostToc collapsible /></div>
 
         <div className="markdown-body" dangerouslySetInnerHTML={{ __html: html }} />
         <CodeCopyButtons />

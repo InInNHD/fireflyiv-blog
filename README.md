@@ -83,7 +83,7 @@ comment: true                       # 是否显示 Artalk 评论
 
 1. 设置环境变量 `CHATTER_TOKEN`（任意长随机字符串，如 `openssl rand -hex 24`）；
 2. 重启 dev server；
-3. 打开 `/admin/chatter`，输入同一个 token，即可发布文字、心情、图片与标签（token 保存在浏览器 localStorage）；公开的 `/chatter` 页面只展示内容。
+3. 打开 `/admin/chatter`，输入同一个 token，即可通过 `/api/admin/chatter` 发布文字、心情、图片与标签（token 仅保存在浏览器 sessionStorage）；公开的 `/chatter` 和 `GET /api/chatter` 只提供读取。Cloudflare Access 应同时保护 `/admin/chatter*` 与 `/api/admin/chatter*`。
 
 ## 更新追番、音乐、图集与最近状态
 

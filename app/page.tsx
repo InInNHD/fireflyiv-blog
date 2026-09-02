@@ -6,50 +6,9 @@ import PostCard from "@/components/post-card";
 import { getListedPosts } from "@/lib/blog";
 import { countChatter, listChatter } from "@/lib/db";
 import { getAnimeData, getGallery, getMusicData, getSiteInfo } from "@/lib/site";
+import { getServiceStatus } from "@/lib/status";
 
 export const revalidate = 60;
-
-interface StatusMonitor {
-  id: number;
-  name: string;
-}
-
-interface StatusHeartbeat {
-  status: number;
-  time?: string;
-}
-
-async function getServiceStatus() {
-  try {
-    const [configResponse, heartbeatResponse] = await Promise.all([
-      fetch("https://status.fireflyiv.com/api/status-page/firefly", {
-        next: { revalidate: 60 },
-        signal: AbortSignal.timeout(2500),
-      }),
-      fetch("https://status.fireflyiv.com/api/status-page/heartbeat/firefly", {
-        next: { revalidate: 60 },
-        signal: AbortSignal.timeout(2500),
-      }),
-    ]);
-    if (!configResponse.ok || !heartbeatResponse.ok) throw new Error("status api failed");
-    const config = await configResponse.json();
-    const heartbeat = await heartbeatResponse.json();
-    const monitors = (config.publicGroupList ?? []).flatMap(
-      (group: { monitorList?: StatusMonitor[] }) => group.monitorList ?? [],
-    );
-    const heartbeatList = (heartbeat.heartbeatList ?? {}) as Record<string, StatusHeartbeat[]>;
-    const latest = monitors.map((monitor: StatusMonitor) => ({
-      monitor,
-      heartbeat: heartbeatList[String(monitor.id)]?.at(-1),
-    }));
-    const up = latest.filter((item: { heartbeat?: StatusHeartbeat }) => item.heartbeat?.status === 1).length;
-    const down = latest.filter((item: { heartbeat?: StatusHeartbeat }) => item.heartbeat?.status !== 1).map((item: { monitor: StatusMonitor }) => item.monitor.name);
-    const checkedAt = latest.map((item: { heartbeat?: StatusHeartbeat }) => item.heartbeat?.time).filter(Boolean).sort().at(-1);
-    return { up, total: monitors.length, down, checkedAt };
-  } catch {
-    return null;
-  }
-}
 
 export default async function HomePage() {
   const site = getSiteInfo();

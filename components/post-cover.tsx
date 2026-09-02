@@ -30,7 +30,10 @@ export default function PostCover({
       <img
         src={cover}
         alt={title}
+        width={1200}
+        height={630}
         loading="lazy"
+        decoding="async"
         className={"object-cover " + className}
       />
     );
