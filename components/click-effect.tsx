@@ -5,6 +5,7 @@ import { useEffect } from "react";
 // 点击反馈：萤火扩散光环 + 中心光点，纯 DOM 实现，零依赖
 export default function ClickEffect() {
   useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     let layer: HTMLDivElement | null = null;
 
     const onClick = (e: MouseEvent) => {

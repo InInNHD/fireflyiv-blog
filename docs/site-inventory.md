@@ -10,8 +10,8 @@
 - 碎碎念 /chatter：SQLite 存储 + Bearer Token 发布 + 心情 emoji + 图片 + 标签 + 独立链接 + 游标分页
 - 标签 /tags + 分类 /categories + 系列 /series + 归档 /archive（时间线）
 - 追番 /anime：观看状态、进度、评分、短评与外链；无条目时显示空状态
-- 音乐 /music：原生音频播放器、歌单切换、LRC 同步滚动与点击跳转歌词
-- 图集 /gallery：内容文件驱动的图集与灯箱
+- 音乐 /music：点击后才加载音频、歌单切换、LRC 同步滚动、错误与无歌词状态
+- 图集 /gallery：内容文件驱动的图集与灯箱；导入脚本剥离 EXIF/GPS，并生成 WebP、AVIF、缩略图与 manifest
 - 友链 /links：卡片展示 + API 入库申请表单 + 可选 Cloudflare Turnstile 校验
 - 关于 /about
 - RSS /feed.xml（构建期静态生成）
@@ -19,6 +19,7 @@
 
 ### 阅读与交互
 - 站内全文搜索（导航 🔍 按钮 + 快捷键 / 打开，Esc 关闭，分词加权、焦点约束与恢复）
+- 手机与平板使用标准导航抽屉，支持 `aria-current`、Esc、焦点循环与关闭后焦点恢复
 - Artalk 评论（talk.fireflyiv.com，未配置时优雅降级）
 - 图片灯箱（正文与图集图片点击放大，Esc 关闭）
 - 返回顶部按钮（滚动 600px 出现）
@@ -26,8 +27,7 @@
 ### 视觉与动效（Firefly 主题）
 - 暗色（默认）+ 亮色双主题，**跟随系统偏好 + 手动切换**（localStorage 记忆，首屏内联脚本防闪烁）
 - 星空背景 + 漂移萤火虫光点
-- 点击萤火扩散光环特效（P0）
-- 鼠标拖尾光点（尊重 prefers-reduced-motion）
+- 点击萤火扩散光环与鼠标拖尾光点（均尊重 `prefers-reduced-motion`）
 - 卡片流布局 + 萤光绿/琥珀黄点缀色
 
 ### SEO 与数据
@@ -36,7 +36,7 @@
 - PWA manifest（可安装基础版；全量离线 SW 未做）
 
 ### 站点辅助
-- 首页：玻璃拟态英雄区 + 自建一言（api.fireflyiv.com，10 分钟缓存）+ 最近状态 + 最新 6 篇
+- 首页：紧凑玻璃 Bento + 自建一言（api.fireflyiv.com，10 分钟缓存）+ 服务状态 + 最新文章；没有真实数据的模块不展示
 - 页脚：分站导航（统计/图床/短链/一言/RSS）
 - 404 定制页
 
@@ -94,8 +94,8 @@
 ## 四、运维体系
 
 ### 备份（每日 03:30 cron）
-- 13 项全量备份至 /opt/backups/：11 个 Docker 卷 + Beszel 数据 + 博客 Markdown 源码 + nginx/systemd/隧道 token
-- 保留 7 天轮转；异地同步（COS/对象存储）待配
+- 12 个 Docker 卷 + Beszel 数据 + 博客源码 + nginx/systemd/隧道 token；Postgres 与 SQLite 使用一致性导出
+- 本地保留 7 天，并通过 rclone crypt 加密同步到 Cloudflare R2；Redis 先 SAVE，排除临时 RDB
 
 ### 监控
 - 可用性：Uptime Kuma 14 项功能探针；页面检查稳定特征，一言 API 校验 JSON 对象，导航检查实际配置文件
@@ -103,10 +103,13 @@
 - 访问统计：Umami（主站埋点，文章 PV 直查展示）
 - 告警：Uptime Kuma 14 个内容探针与 Beszel 资源阈值均发送到 QQ 邮箱；磁盘使用率达到 80% 时告警
 - 磁盘维护：Docker 构建缓存每周限制在 3GB；2026-09-02 首次清理释放 6.26GB，系统盘使用率由 72% 降至 56%
+- 独立冒烟命令：`npm run check:smoke` 验证 14 个公网入口、内容、JSON、MIME 与 Access 例外
 
 ### 安全
 - 服务器仅开 22（安全组）；全部服务绑 127.0.0.1 或 docker 内网
 - 隧道流量 TLS 由 Cloudflare 边缘签发
+- apex HSTS 覆盖子域；Shlink、Beszel 与管理路径由 Cloudflare Access 保护，Umami 仅公开脚本和采集 API
+- 友链申请启用 Cloudflare Turnstile
 - 密码：应用层 6 系统统一密码，Vaultwarden 管理；SSH/Cloudflare 高敏凭据用户自持
 - 密码表：服务器 ~/firefly-passwords.txt (600)
 

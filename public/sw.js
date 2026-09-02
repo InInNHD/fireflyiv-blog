@@ -1,5 +1,5 @@
 // FireflyIv Service Worker：静态资源 cache-first，页面 network-first + 离线兜底
-const CACHE = "firefly-v1";
+const CACHE = "firefly-v2";
 
 self.addEventListener("install", (e) => {
   e.waitUntil(
@@ -25,6 +25,7 @@ self.addEventListener("fetch", (e) => {
   if (
     url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/covers/") ||
+    url.pathname.startsWith("/gallery/") ||
     url.pathname.startsWith("/favicon")
   ) {
     e.respondWith(

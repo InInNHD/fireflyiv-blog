@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SearchDialog from "./search-dialog";
 import ThemeToggle from "./theme-toggle";
 
@@ -24,16 +24,29 @@ const LINKS = [
 export default function Nav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerRef = useRef<HTMLElement>(null);
   const active = (href: string) => href === "/" ? pathname === "/" : pathname === href || pathname.startsWith(`${href}/`);
 
   useEffect(() => setOpen(false), [pathname]);
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
+      if (event.key === "Escape") {
+        setOpen(false);
+        menuButtonRef.current?.focus();
+      }
+      if (event.key !== "Tab" || !drawerRef.current) return;
+      const items = drawerRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])');
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
     };
     document.body.style.overflow = "hidden";
     window.addEventListener("keydown", onKey);
+    window.setTimeout(() => drawerRef.current?.querySelector<HTMLElement>("button")?.focus(), 0);
     return () => {
       document.body.style.overflow = "";
       window.removeEventListener("keydown", onKey);
@@ -60,17 +73,18 @@ export default function Nav() {
           <span className="text-glow">Firefly<span className="text-accent">Iv</span></span>
         </Link>
 
-        <nav aria-label="主导航" className="hidden items-center gap-1 text-sm whitespace-nowrap md:flex">
+        <nav aria-label="主导航" className="hidden items-center gap-1 text-sm whitespace-nowrap xl:flex">
           {LINKS.map((link) => navLink(link))}
           <SearchDialog />
           <ThemeToggle />
         </nav>
 
-        <nav aria-label="移动端主导航" className="flex items-center gap-0.5 text-sm whitespace-nowrap md:hidden">
+        <nav aria-label="移动端主导航" className="flex items-center gap-0.5 text-sm whitespace-nowrap xl:hidden">
           {LINKS.slice(0, 2).map((link) => navLink(link, true))}
           <SearchDialog />
           <ThemeToggle />
           <button
+            ref={menuButtonRef}
             type="button"
             className="chip cursor-pointer select-none"
             aria-label="打开全部导航"
@@ -86,9 +100,12 @@ export default function Nav() {
     </header>
 
       {open && (
-        <div className="fixed inset-0 top-[57px] z-50 bg-black/55 backdrop-blur-sm md:hidden" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 top-[57px] z-50 bg-black/55 backdrop-blur-sm xl:hidden" onClick={() => { setOpen(false); menuButtonRef.current?.focus(); }}>
           <aside
+            ref={drawerRef}
             id="mobile-nav-drawer"
+            role="dialog"
+            aria-modal="true"
             aria-label="全部导航"
             className="ml-auto h-full w-[min(82vw,20rem)] border-l border-line bg-bg p-5 shadow-2xl"
             onClick={(event) => event.stopPropagation()}

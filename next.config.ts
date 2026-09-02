@@ -35,7 +35,13 @@ const nextConfig: NextConfig = {
   // 不暴露 x-powered-by，减少指纹信息
   poweredByHeader: false,
   async headers() {
-    return [{ source: "/:path*", headers: securityHeaders }];
+    const publicAssetCache = [{ key: "Cache-Control", value: "public, max-age=86400, stale-while-revalidate=604800" }];
+    return [
+      { source: "/:path*", headers: securityHeaders },
+      { source: "/covers/:path*", headers: publicAssetCache },
+      { source: "/gallery/:path*", headers: publicAssetCache },
+      { source: "/music/:path*", headers: publicAssetCache },
+    ];
   },
 };
 

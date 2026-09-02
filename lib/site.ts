@@ -47,6 +47,10 @@ export interface AnimeData {
 
 export interface GalleryItem {
   src: string;
+  avif?: string;
+  thumbnail?: string;
+  width?: number;
+  height?: number;
   alt: string;
   caption?: string;
   date?: string;

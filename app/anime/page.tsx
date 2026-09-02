@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { getAnimeData, type AnimeStatus } from "@/lib/site";
 
-export const metadata: Metadata = { title: "追番", description: "FireflyIv 的动画观看记录", alternates: { canonical: "/anime" } };
+export function generateMetadata(): Metadata {
+  return { title: "追番", description: "FireflyIv 的动画观看记录", alternates: { canonical: "/anime" }, robots: getAnimeData().items.length ? undefined : { index: false, follow: true } };
+}
 
 const STATUS: Record<AnimeStatus, { label: string; icon: string }> = {
   watching: { label: "正在看", icon: "📺" },

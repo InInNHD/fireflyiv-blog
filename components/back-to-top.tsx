@@ -17,9 +17,9 @@ export default function BackToTop() {
     <button
       aria-label="返回顶部"
       title="返回顶部"
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      onClick={() => window.scrollTo({ top: 0, behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" })}
       className={
-        "fixed bottom-6 right-6 z-40 grid size-10 place-items-center rounded-full border border-line bg-surface2 text-muted shadow-lg backdrop-blur transition-all hover:text-accent hover:border-accent/50 " +
+        "fixed bottom-6 right-6 z-40 grid size-11 place-items-center rounded-full border border-line bg-surface2 text-muted shadow-lg backdrop-blur transition-all hover:text-accent hover:border-accent/50 " +
         (visible ? "opacity-100" : "pointer-events-none opacity-0")
       }
     >

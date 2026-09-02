@@ -48,12 +48,14 @@ export default async function HomePage() {
   const watching = anime.items.find((item) => item.status === "watching");
   const currentTrack = music.tracks[0];
   const serviceStatus = await getServiceStatus();
+  const summaryColumns = 1 + Number(chatterCount > 0) + Number(gallery.length > 0);
+  const hasNow = Boolean(site.now?.game || site.now?.music || site.now?.note);
 
   return (
     <div className="space-y-6 pt-6 sm:pt-8">
       <HomeSearchTrigger />
 
-      <section className="grid gap-4 lg:grid-cols-[1.35fr_0.85fr]" aria-label="个人简介与当前音乐">
+      <section className={currentTrack ? "grid gap-4 lg:grid-cols-[1.35fr_0.85fr]" : ""} aria-label="个人简介与当前音乐">
         <article className="glass-panel glass-feature overflow-hidden p-5 sm:p-6">
           <div className="flex items-center gap-4 sm:gap-5">
             <img
@@ -70,10 +72,10 @@ export default async function HomePage() {
             </div>
           </div>
           <Hitokoto className="mt-4 hidden max-w-2xl sm:block" />
-          <div className="mt-5 grid grid-cols-3 gap-2 text-center">
+          <div className={`mt-5 grid gap-2 text-center ${summaryColumns === 3 ? "grid-cols-3" : summaryColumns === 2 ? "grid-cols-2" : "grid-cols-1"}`}>
             <Link href="/posts" className="rounded-xl bg-surface2 px-2 py-3"><strong className="block text-lg text-accent">{allPosts.length}</strong><span className="text-xs text-muted">文章</span></Link>
-            <Link href="/chatter" className="rounded-xl bg-surface2 px-2 py-3"><strong className="block text-lg text-accent">{chatterCount}</strong><span className="text-xs text-muted">动态</span></Link>
-            <Link href="/gallery" className="rounded-xl bg-surface2 px-2 py-3"><strong className="block text-lg text-accent">{gallery.length}</strong><span className="text-xs text-muted">相册</span></Link>
+            {chatterCount > 0 && <Link href="/chatter" className="rounded-xl bg-surface2 px-2 py-3"><strong className="block text-lg text-accent">{chatterCount}</strong><span className="text-xs text-muted">动态</span></Link>}
+            {gallery.length > 0 && <Link href="/gallery" className="rounded-xl bg-surface2 px-2 py-3"><strong className="block text-lg text-accent">{gallery.length}</strong><span className="text-xs text-muted">相册</span></Link>}
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
             {site.social.github && <a href={site.social.github} target="_blank" rel="noreferrer" className="chip">GitHub ↗</a>}
@@ -82,54 +84,46 @@ export default async function HomePage() {
           </div>
         </article>
 
-        <article className="glass-panel flex min-h-48 flex-col justify-between overflow-hidden p-5 sm:min-h-64 sm:p-6">
+        {currentTrack && <article className="glass-panel flex min-h-48 flex-col justify-between overflow-hidden p-5 sm:min-h-64 sm:p-6">
           <div>
             <p className="text-xs uppercase tracking-[0.24em] text-accent">Now playing</p>
             <div className="mt-3 grid size-16 place-items-center rounded-full border-[6px] border-bg bg-surface2 text-2xl shadow-[0_0_28px_color-mix(in_srgb,var(--accent)_18%,transparent)] sm:mt-5 sm:size-20 sm:border-[7px] sm:text-3xl">♫</div>
-            <h2 className="mt-3 text-xl font-semibold sm:mt-5">{currentTrack?.title ?? "歌单等待点亮"}</h2>
-            <p className="mt-1 text-sm text-muted">{currentTrack?.artist ?? "只展示你合法托管的音频"}</p>
+            <h2 className="mt-3 text-xl font-semibold sm:mt-5">{currentTrack.title}</h2>
+            <p className="mt-1 text-sm text-muted">{currentTrack.artist}</p>
           </div>
-          {currentTrack ? (
-            <audio className="mt-5 w-full" controls preload="metadata" src={currentTrack.src}>当前浏览器不支持音频播放。</audio>
-          ) : (
-            <Link href="/music" className="btn-accent mt-3 w-fit sm:mt-5">打开音乐与歌词 →</Link>
-          )}
-        </article>
+          <audio className="mt-5 w-full" controls preload="none" src={currentTrack.src}>当前浏览器不支持音频播放。</audio>
+        </article>}
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label="站点近况">
-        <Link href="/chatter" className="glass-panel glass-panel-hover min-h-40 p-5 lg:col-span-2">
+        {chatter && <Link href="/chatter" className="glass-panel glass-panel-hover min-h-40 p-5 lg:col-span-2">
           <p className="text-xs text-accent">最新碎碎念</p>
-          <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted">{chatter?.content ?? "暂时还没有动态，真实记录会从这里开始。"}</p>
+          <p className="mt-4 line-clamp-3 text-sm leading-relaxed text-muted">{chatter.content}</p>
           <span className="mt-4 inline-block text-xs text-muted">共 {chatterCount} 条 →</span>
-        </Link>
-        <Link href="/gallery" className="glass-panel glass-panel-hover min-h-40 overflow-hidden p-5">
+        </Link>}
+        {gallery[0] && <Link href="/gallery" className="glass-panel glass-panel-hover min-h-40 overflow-hidden p-5">
           <p className="text-xs text-accent">最近相册</p>
-          {gallery[0] ? (
-            <>
-              <p className="mt-4 font-medium">{gallery[0].caption ?? gallery[0].alt}</p>
-              <p className="mt-2 text-xs text-muted">{gallery[0].date ?? "查看相册"} →</p>
-            </>
-          ) : <p className="mt-4 text-sm leading-relaxed text-muted">等待加入真实照片，不再使用文章封面充数。</p>}
-        </Link>
-        <Link href="/anime" className="glass-panel glass-panel-hover min-h-40 p-5">
+          <p className="mt-4 font-medium">{gallery[0].caption ?? gallery[0].alt}</p>
+          <p className="mt-2 text-xs text-muted">{gallery[0].date ?? "查看相册"} →</p>
+        </Link>}
+        {watching && <Link href="/anime" className="glass-panel glass-panel-hover min-h-40 p-5">
           <p className="text-xs text-accent">正在追番</p>
-          <p className="mt-4 font-medium">{watching?.title ?? "片单待整理"}</p>
-          <p className="mt-2 text-xs text-muted">{watching?.progress ?? `${anime.items.length} 部记录`} →</p>
-        </Link>
+          <p className="mt-4 font-medium">{watching.title}</p>
+          <p className="mt-2 text-xs text-muted">{watching.progress ?? `${anime.items.length} 部记录`} →</p>
+        </Link>}
         <a href="https://status.fireflyiv.com" target="_blank" rel="noreferrer" className="glass-panel glass-panel-hover min-h-32 p-5 sm:col-span-2 lg:col-span-1">
           <p className="text-xs text-accent">服务状态</p>
           <p className="mt-3 text-2xl font-semibold">{serviceStatus ? `${serviceStatus.up}/${serviceStatus.total}` : "查看状态"}</p>
           <p className="mt-1 text-xs text-muted">{serviceStatus && serviceStatus.up === serviceStatus.total ? "全部服务正常" : "打开实时状态页 →"}</p>
         </a>
-        <div className="glass-panel min-h-32 p-5 sm:col-span-2 lg:col-span-3">
+        {hasNow && <div className="glass-panel min-h-32 p-5 sm:col-span-2 lg:col-span-3">
           <p className="text-xs text-accent">最近状态</p>
           <div className="mt-3 grid gap-2 text-sm sm:grid-cols-3">
-            <Link href="/anime" className="rounded-xl bg-surface2 p-3"><span className="text-muted">📺 追番</span><strong className="mt-1 block">{watching?.title ?? "片单持续更新"}</strong></Link>
-            <Link href="/music" className="rounded-xl bg-surface2 p-3"><span className="text-muted">🎧 在听</span><strong className="mt-1 block">{currentTrack?.title ?? "歌单待更新"}</strong></Link>
-            <div className="rounded-xl bg-surface2 p-3"><span className="text-muted">✨ 近况</span><strong className="mt-1 block">{site.now?.note ?? "持续建设中"}</strong></div>
+            {site.now?.game && <div className="rounded-xl bg-surface2 p-3"><span className="text-muted">🎮 在玩</span><strong className="mt-1 block">{site.now.game}</strong></div>}
+            {site.now?.music && <Link href="/music" className="rounded-xl bg-surface2 p-3"><span className="text-muted">🎧 在听</span><strong className="mt-1 block">{site.now.music}</strong></Link>}
+            {site.now?.note && <div className="rounded-xl bg-surface2 p-3"><span className="text-muted">✨ 近况</span><strong className="mt-1 block">{site.now.note}</strong></div>}
           </div>
-        </div>
+        </div>}
       </section>
 
       <section>

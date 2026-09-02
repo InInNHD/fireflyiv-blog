@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { getGallery } from "@/lib/site";
 
-export const metadata: Metadata = { title: "相册", description: "FireflyIv 的图片与小站记忆", alternates: { canonical: "/gallery" } };
+export function generateMetadata(): Metadata {
+  return { title: "相册", description: "FireflyIv 的图片与小站记忆", alternates: { canonical: "/gallery" }, robots: getGallery().length ? undefined : { index: false, follow: true } };
+}
 
 export default function GalleryPage() {
   const items = getGallery();
@@ -14,7 +16,19 @@ export default function GalleryPage() {
         <div data-lightbox className="columns-1 gap-4 sm:columns-2 lg:columns-3">
           {items.map((item) => (
             <figure key={item.src} className="card mb-4 break-inside-avoid overflow-hidden">
-              <img src={item.src} alt={item.alt} loading="lazy" className="w-full cursor-zoom-in object-cover" />
+              <img
+                src={item.thumbnail ?? item.src}
+                data-full-src={item.src}
+                alt={item.alt}
+                width={item.width}
+                height={item.height}
+                loading="lazy"
+                decoding="async"
+                role="button"
+                tabIndex={0}
+                aria-label={`放大图片：${item.alt}`}
+                className="w-full cursor-zoom-in object-cover"
+              />
               {(item.caption || item.date) && (
                 <figcaption className="space-y-1 p-3 text-sm"><p>{item.caption}</p>{item.date && <time className="text-xs text-muted">{item.date}</time>}</figcaption>
               )}

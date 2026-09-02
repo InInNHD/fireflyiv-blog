@@ -22,7 +22,7 @@ export default function AboutPage() {
           个人博客，部署在我自己的腾讯云服务器上，经 Cloudflare Tunnel 穿透出网。
         </p>
         <p>
-          灵感来源于 XinghuisamaBlogs 这类「Next.js 高颜值博客」项目：卡片流、碎碎念、移动端优先。
+          灵感来源于 <a href="https://www.xinghuisama.top" target="_blank" rel="noreferrer" className="text-accent underline-offset-4 hover:underline">XinghuisamaBlogs</a> 等个人站项目：卡片流、碎碎念、移动端优先。
           这个站点刻意保持简单——文章用 Markdown 写在仓库里，碎碎念和评论自托管，数据永远在自己手里。
         </p>
         <div className="grid gap-2 rounded-xl bg-surface2 p-4 text-sm">

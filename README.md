@@ -76,7 +76,7 @@ comment: true                       # 是否显示 Artalk 评论
 正文 Markdown 内容…
 ```
 
-保存后开发模式下立即生效；标签、分类、系列、归档、RSS 与 sitemap 均自动同步。提交前可运行 `npm run check:content` 检查内容格式。
+保存后开发模式下立即生效；标签、分类、系列、归档、RSS 与 sitemap 均自动同步。提交前运行 `npm run typecheck` 与 `npm run check:content`，生产构建后再运行 `npm run check:performance`。
 
 ## 发布碎碎念
 
@@ -87,8 +87,8 @@ comment: true                       # 是否显示 Artalk 评论
 ## 更新追番、音乐、图集与最近状态
 
 - `content/anime.json`：维护追番条目、状态、进度、评分、封面与短评；未录入时页面显示诚实的空状态。
-- `content/music.json`：维护歌曲标题、歌手、音频、封面和 LRC 歌词；建议将音频放在 `public/music/` 并使用 `/music/文件名.mp3`。
-- `content/gallery.json`：维护图片地址、替代文本、说明与日期，图片会自动接入灯箱。
+- `content/music.json`：维护歌曲标题、歌手、音频、封面和 LRC 歌词；只放有权公开托管的音频，播放器会在用户点击后加载。
+- `content/gallery.json`：维护图片地址、替代文本、说明与日期；原图可先用 `npm run prepare:gallery` 剥离 EXIF/GPS 并生成 WebP、AVIF 和缩略图。
 - `content/site.json` 的 `now`：维护首页当前游戏、音乐和一句近况。
 
 ## Docker 本地部署
@@ -148,3 +148,4 @@ GitHub: InInNHD/fireflyiv-blog（Public，已做敏感信息脱敏）
 - **敏感信息红线**：`.env`、密码、授权码**绝不入库**（已 .gitignore；样例见各 `.env.example`）
 - **服务器对齐**：每小时自动 pull；手动触发：`cd ~/fireflyiv-blog && git pull origin main`
 - **一致性检查**：本机 `git status`、服务器 `git log --oneline -1`、GitHub 网页，三者应指向同一 commit
+- **公网验收**：运行 `npm run check:smoke`，一次检查 14 个入口及内容、JSON、静态资源 MIME 与 Access 边界

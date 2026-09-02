@@ -24,11 +24,17 @@ jobs:
       - name: 类型检查
         run: npm run typecheck
 
+      - name: 内容校验
+        run: npm run check:content
+
       - name: 生产构建
         run: npm run build
         env:
           NEXT_PUBLIC_ARTALK_SERVER: https://talk.fireflyiv.com
           SITE_URL: https://www.fireflyiv.com
+
+      - name: 静态资源预算
+        run: npm run check:performance
 
       - name: 依赖安全审计（高危即失败）
         run: npm audit --audit-level=high

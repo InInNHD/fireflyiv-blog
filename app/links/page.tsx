@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import FriendForm from "@/components/friend-form";
 import { getFriendLinks, getSiteInfo } from "@/lib/site";
 
-export const metadata: Metadata = { title: "友链", alternates: { canonical: "/links" } };
+export function generateMetadata(): Metadata {
+  return { title: "友链", alternates: { canonical: "/links" }, robots: getFriendLinks().length ? undefined : { index: false, follow: true } };
+}
 
 export default function LinksPage() {
   const links = getFriendLinks();
@@ -16,7 +18,7 @@ export default function LinksPage() {
           那些散落在网络星河里的有趣站点。每一束微光，都通向一个真实而独特的世界。
         </p>
       </header>
-      <div className="grid gap-4 sm:grid-cols-2">
+      {links.length ? <div className="grid gap-4 sm:grid-cols-2">
         {links.map((l) => (
           <a key={l.url} href={l.url} target="_blank" rel="noreferrer" className="glass-panel glass-panel-hover group flex items-center gap-4 p-5">
             <div className="link-avatar grid size-14 shrink-0 place-items-center rounded-2xl text-2xl">
@@ -29,7 +31,7 @@ export default function LinksPage() {
             <span className="text-muted transition-transform group-hover:translate-x-1 group-hover:text-accent" aria-hidden>↗</span>
           </a>
         ))}
-      </div>
+      </div> : <div className="glass-panel p-7 text-center text-sm text-muted">真实互换友链正在整理中。</div>}
 
       {/* 友链申请（mailto 表单，无需后端） */}
       <section className="max-w-lg">

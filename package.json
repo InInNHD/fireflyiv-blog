@@ -8,7 +8,10 @@
     "build": "next build",
     "start": "node .next/standalone/server.js",
     "typecheck": "tsc --noEmit",
-    "check:content": "node scripts/check-content.mjs"
+    "check:content": "node scripts/check-content.mjs",
+    "check:performance": "node scripts/check-performance.mjs",
+    "check:smoke": "node scripts/smoke-test.mjs",
+    "prepare:gallery": "node scripts/prepare-gallery.mjs"
   },
   "dependencies": {
     "artalk": "^2.10.0",
@@ -32,6 +35,7 @@
     "@types/pg": "^8.23.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "sharp": "^0.35.4",
     "tailwindcss": "^4.1.0",
     "typescript": "^5.8.0"
   }

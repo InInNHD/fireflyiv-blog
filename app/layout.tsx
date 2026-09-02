@@ -60,13 +60,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
+        <a href="#main-content" className="sr-only z-[10000] rounded-md bg-bg px-4 py-2 text-fg focus:not-sr-only focus:fixed focus:left-4 focus:top-4">跳到正文</a>
         <ClickEffect />
         <MouseTrail />
         <ImageLightbox />
         <BackToTop />
         <Fireflies />
         <Nav />
-        <main className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16">{children}</main>
+        <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-6xl flex-1 px-4 pb-16">{children}</main>
         <footer className="border-t border-line px-4 py-8 text-center text-sm text-muted">
           <nav aria-label="分站导航" className="mb-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1.5">
             <a href="https://stats.fireflyiv.com" target="_blank" rel="noreferrer" className="transition-colors hover:text-accent">📊 统计</a>

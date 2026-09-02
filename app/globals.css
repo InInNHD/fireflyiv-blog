@@ -400,9 +400,26 @@ html.light .glass-panel {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
   .music-cover { animation: none; }
   .glass-panel-hover { transition: border-color 0.2s ease; }
   .glass-panel-hover:hover { transform: none; }
+}
+
+@media (max-width: 1279px) {
+  header .chip { min-width: 2.75rem; min-height: 2.75rem; justify-content: center; }
+  header nav a { min-height: 2.75rem; display: inline-flex; align-items: center; }
+}
+
+:where(a, button, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
 }
 
 .chip {
