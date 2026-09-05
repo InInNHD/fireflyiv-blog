@@ -15,22 +15,44 @@ export default function ArtalkComments({
 
   useEffect(() => {
     if (!server || !elRef.current) return;
+    const el = elRef.current;
     let disposed = false;
     let artalk: { destroy: () => void } | null = null;
+    let io: IntersectionObserver | null = null;
 
-    import("artalk").then(({ default: Artalk }) => {
-      if (disposed || !elRef.current) return;
-      artalk = Artalk.init({
-        el: elRef.current,
-        server,
-        site: "fireflyiv",
-        pageKey,
-        pageTitle,
+    const load = () => {
+      if (disposed) return;
+      import("artalk").then(({ default: Artalk }) => {
+        if (disposed || !elRef.current) return;
+        artalk = Artalk.init({
+          el: elRef.current,
+          server,
+          site: "fireflyiv",
+          pageKey,
+          pageTitle,
+        });
       });
-    });
+    };
+
+    // 懒加载：滚动到评论区附近（提前 300px）才开始初始化，减少首屏开销
+    if (typeof IntersectionObserver !== "undefined") {
+      io = new IntersectionObserver(
+        (entries) => {
+          if (entries.some((e) => e.isIntersecting)) {
+            io?.disconnect();
+            load();
+          }
+        },
+        { rootMargin: "300px 0px" }
+      );
+      io.observe(el);
+    } else {
+      load();
+    }
 
     return () => {
       disposed = true;
+      io?.disconnect();
       artalk?.destroy();
     };
   }, [server, pageKey, pageTitle]);

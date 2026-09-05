@@ -19,6 +19,8 @@ OUT=$(mktemp)
   echo "1) 系统安全更新建议 3 天内完成: sudo apt upgrade"
   echo "2) 镜像升级流程见 deploy/README.md「月度升级」"
   echo "3) 前端依赖: 本地 npm update -> typecheck -> build -> CI 通过自动发布"
+  echo "4) Shlink API key 季度轮换(3/6/9/12月): docker exec shlink shlink api-key:generate -m rotate && 更新 shlink/.env"
+  echo "5) 半年复核: Cloudflare Access 名单 / Turnstile 密钥 / 统一密码轮换 / SSH authorized_keys"
 } > "$OUT" 2>&1
 cat "$OUT" >> "$LOG"
 set -a; source ~/fireflyiv-blog/deploy/.env 2>/dev/null; set +a

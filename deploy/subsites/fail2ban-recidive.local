@@ -1,0 +1,9 @@
+# 惯犯封禁：同一 IP 一天内被 fail2ban 任一 jail 封禁 >=5 次 → 全端口封禁 1 周
+# 部署：sudo cp 到 /etc/fail2ban/jail.d/recidive.local && sudo systemctl reload fail2ban
+[recidive]
+enabled = true
+logpath = /var/log/fail2ban.log
+banaction = %(banaction_allports)s
+bantime = 1w
+findtime = 1d
+maxretry = 5

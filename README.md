@@ -1,5 +1,7 @@
 # FireflyIv Blog
 
+[![CI](https://github.com/InInNHD/fireflyiv-blog/actions/workflows/ci.yml/badge.svg)](https://github.com/InInNHD/fireflyiv-blog/actions)
+
 萤火虽微，愿为其芒 —— 自托管的个人博客（Next.js 16 + React 19 + Tailwind CSS v4 + SQLite）。
 
 - 文章：Markdown 写在 `content/posts/`，支持分类、系列、置顶、阅读时长、相关文章、过期提示与独立评论开关

@@ -24,6 +24,8 @@ services:
       - UNAUTHENTICATED_RATELIMIT_MAX_BURST=20
       - ADMIN_RATELIMIT_SECONDS=300
       - ADMIN_RATELIMIT_MAX_BURST=3
+      # 管理面板 https://vault.fireflyiv.com/admin（token 放本目录 .env，gitignore）
+      - ADMIN_TOKEN=${ADMIN_TOKEN:-}
     volumes:
       - vaultwarden-data:/data
 volumes:

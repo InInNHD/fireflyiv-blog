@@ -1,0 +1,31 @@
+name: Lighthouse
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 5 1 * *'  # 每月 1 号
+permissions:
+  contents: read
+jobs:
+  lighthouse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: 生产构建
+        run: npm run build
+        env:
+          NEXT_PUBLIC_ARTALK_SERVER: https://talk.fireflyiv.com
+          SITE_URL: https://www.fireflyiv.com
+      - name: 组装 standalone 并启动
+        run: |
+          cp -r .next/static .next/standalone/.next/static
+          cp -r public .next/standalone/public
+          PORT=3000 HOSTNAME=127.0.0.1 node .next/standalone/server.js &
+          npx wait-on http://127.0.0.1:3000
+      - name: Lighthouse 审计
+        run: npx --yes @lhci/cli autorun --config=.lighthouserc.json

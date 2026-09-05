@@ -26,6 +26,8 @@ self.addEventListener("fetch", (e) => {
     url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/covers/") ||
     url.pathname.startsWith("/gallery/") ||
+    url.pathname === "/search-index.json" ||
+    url.pathname === "/manifest.webmanifest" ||
     url.pathname.startsWith("/favicon")
   ) {
     e.respondWith(
