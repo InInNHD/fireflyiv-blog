@@ -6,11 +6,11 @@ from email.mime.text import MIMEText
 
 subject = sys.argv[1] if len(sys.argv) > 1 else "FireflyIv 通知"
 body = sys.stdin.read() or "(空)"
-host = os.environ.get("SMTP_HOST")
-port = int(os.environ.get("SMTP_PORT", "465"))
-user = os.environ.get("SMTP_USER")
+host = os.environ.get("SMTP_HOST") or "smtp.qq.com"
+port = int(os.environ.get("SMTP_PORT") or "465")
+user = os.environ.get("SMTP_USER") or "firefly1v@qq.com"
 pw = os.environ.get("SMTP_PASS")
-to = os.environ.get("FRIEND_NOTIFY_TO") or os.environ.get("SMTP_USER")
+to = os.environ.get("FRIEND_NOTIFY_TO") or os.environ.get("SMTP_USER") or "firefly1v@qq.com"
 if not (host and user and pw and to):
     print("mail.py: SMTP 环境变量缺失，跳过发送")
     sys.exit(0)
